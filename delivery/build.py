@@ -17,4 +17,5 @@ title = "# 空印\n\n"
 after = (root / "delivery" / "afterword.md").read_text(encoding="utf-8").strip()
 text = title + "\n\n---\n\n".join(out) + "\n\n---\n\n" + after + "\n"
 (root / "delivery" / "空印_全稿.md").write_text(text, encoding="utf-8")
-print("已寫入 delivery/空印_全稿.md")
+(root / "空印_全稿.md").write_text(text, encoding="utf-8")
+print("已寫入 delivery/空印_全稿.md 與根目錄 空印_全稿.md")
