@@ -1,0 +1,2390 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="xuan">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>空印 — 全書精裝閱讀版</title>
+    <style>
+
+        :root {
+            --font-serif: "Songti TC", "Noto Serif CJK TC", "Source Han Serif TC", "PMingLiU", "PingFang SC", "Hiragino Sans GB", "Baskerville", serif;
+            --font-kai: "Kaiti TC", "STKaiti", "BiauKai", "DFKai-SB", serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft YaHei", sans-serif;
+            --reader-font: var(--font-serif);
+            --content-width: 820px;
+            --font-size: 19px;
+            --line-height: 1.95;
+            --letter-spacing: 0.04em;
+        }
+
+        /* 主題顏色定義 */
+        /* 1. 宣紙米黃 (預設經典) */
+        [data-theme="xuan"] {
+            --bg-color: #fbf8f1;
+            --card-bg: #f5f0e3;
+            --text-color: #2b2621;
+            --text-muted: #6b6359;
+            --accent-red: #9e2a2b;
+            --accent-vermilion: #b83b26;
+            --border-color: #dfd7c5;
+            --quote-bg: #efe8d5;
+            --nav-bg: #f4eee0;
+            --nav-border: #dfd5c2;
+            --clue-bg: #eadbc5;
+            --clue-text: #702619;
+            --shadow-color: rgba(43, 38, 33, 0.06);
+        }
+
+        /* 2. 羊皮象牙白 */
+        [data-theme="ivory"] {
+            --bg-color: #faf9f6;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --text-muted: #6c757d;
+            --accent-red: #a4161a;
+            --accent-vermilion: #ba181b;
+            --border-color: #e9ecef;
+            --quote-bg: #f8f9fa;
+            --nav-bg: #f1f3f5;
+            --nav-border: #dee2e6;
+            --clue-bg: #f8d7da;
+            --clue-text: #721c24;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 3. 幽夜月魄 (深色模式) */
+        [data-theme="moon"] {
+            --bg-color: #17181c;
+            --card-bg: #1f2127;
+            --text-color: #d6d9e0;
+            --text-muted: #8b92a2;
+            --accent-red: #e63946;
+            --accent-vermilion: #f25c54;
+            --border-color: #2e323d;
+            --quote-bg: #262933;
+            --nav-bg: #1a1c22;
+            --nav-border: #2e323d;
+            --clue-bg: #3a2528;
+            --clue-text: #ff9b9b;
+            --shadow-color: rgba(0, 0, 0, 0.35);
+        }
+
+        /* 4. 澄明素白 */
+        [data-theme="white"] {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --text-color: #1a1a1a;
+            --text-muted: #595959;
+            --accent-red: #c1121f;
+            --accent-vermilion: #780000;
+            --border-color: #e5e5e5;
+            --quote-bg: #f7f7f7;
+            --nav-bg: #fafafa;
+            --nav-border: #e0e0e0;
+            --clue-bg: #fde8e8;
+            --clue-text: #991b1b;
+            --shadow-color: rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--reader-font);
+            font-size: var(--font-size);
+            line-height: var(--line-height);
+            letter-spacing: var(--letter-spacing);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 頂部閱讀進度條 */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-vermilion));
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+        }
+
+        /* 頂部控制列 */
+        .top-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 900;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            backdrop-filter: blur(8px);
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            letter-spacing: 0.1em;
+            font-family: var(--font-kai);
+        }
+
+        .brand-badge {
+            font-size: 0.75rem;
+            background: var(--accent-red);
+            color: #fff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tool-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .btn-icon {
+            font-size: 0.95rem;
+        }
+
+        /* 容器佈局 */
+        .app-layout {
+            display: flex;
+            margin-top: 56px;
+            min-height: calc(100vh - 56px);
+        }
+
+        /* 側欄章節目錄 */
+        .sidebar {
+            width: 320px;
+            background-color: var(--nav-bg);
+            border-right: 1px solid var(--nav-border);
+            position: fixed;
+            top: 56px;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+            padding: 20px 0;
+            transition: transform 0.3s ease;
+            z-index: 850;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 0 20px 16px 20px;
+            border-bottom: 1px solid var(--nav-border);
+            margin-bottom: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: var(--quote-bg);
+            border-left-color: var(--accent-vermilion);
+        }
+
+        .nav-item.active a {
+            background-color: var(--quote-bg);
+            border-left-color: var(--accent-red);
+            color: var(--accent-red);
+            font-weight: 700;
+        }
+
+        .nav-title {
+            font-size: 0.98rem;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .nav-meta {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-sans);
+        }
+
+        /* 主要閱讀主體 */
+        .main-content {
+            flex: 1;
+            margin-left: 320px;
+            padding: 40px 24px 100px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 0;
+        }
+
+        .reader-container {
+            width: 100%;
+            max-width: var(--content-width);
+        }
+
+        /* 卷首封面卡片 */
+        .front-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 48px 40px;
+            margin-bottom: 60px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            text-align: center;
+        }
+
+        .front-seal {
+            display: inline-block;
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+            font-family: var(--font-kai);
+            font-size: 1rem;
+            padding: 4px 16px;
+            margin-bottom: 20px;
+            letter-spacing: 0.2em;
+            border-radius: 4px;
+        }
+
+        .front-title {
+            font-size: 2.8rem;
+            font-family: var(--font-kai);
+            color: var(--text-color);
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .front-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            letter-spacing: 0.08em;
+        }
+
+        .front-quote {
+            max-width: 640px;
+            margin: 0 auto 36px auto;
+            padding: 20px 24px;
+            background: var(--quote-bg);
+            border-left: 4px solid var(--accent-red);
+            border-radius: 0 8px 8px 0;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-color);
+            text-align: left;
+            font-style: normal;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+            text-align: left;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+        }
+
+        .meta-col-label {
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .meta-col-val {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        /* 章節卡片 */
+        .chapter-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 60px 52px;
+            margin-bottom: 60px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            scroll-margin-top: 80px;
+        }
+
+        .chapter-badge {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-family: var(--font-sans);
+            font-size: 0.82rem;
+            margin-bottom: 16px;
+        }
+
+        .badge-seq {
+            background: var(--accent-red);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .badge-date {
+            color: var(--text-muted);
+        }
+
+        .chapter-main-heading {
+            font-size: 2.2rem;
+            font-family: var(--font-kai);
+            letter-spacing: 0.08em;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .chapter-summary {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .chapter-divider-line {
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent-red), transparent);
+            margin-bottom: 36px;
+        }
+
+        /* 正文排版 */
+        .chapter-body p {
+            margin-bottom: 1.45em;
+            text-indent: 2em;
+            text-align: justify;
+        }
+
+        .chapter-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .scene-number {
+            text-align: center;
+            font-size: 1.15rem;
+            font-family: var(--font-kai);
+            color: var(--accent-red);
+            letter-spacing: 0.25em;
+            margin: 40px 0 24px 0;
+            text-indent: 0 !important;
+        }
+
+        .scene-divider {
+            text-align: center;
+            margin: 44px 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 0.4em;
+        }
+
+        .docket-quote {
+            margin: 28px 0;
+            padding: 16px 20px;
+            background: var(--quote-bg);
+            border-left: 3px solid var(--accent-red);
+            border-radius: 0 6px 6px 0;
+            font-size: 0.98rem;
+            line-height: 1.8;
+            text-indent: 0 !important;
+            color: var(--text-color);
+        }
+
+        .clue-tag {
+            background: var(--clue-bg);
+            color: var(--clue-text);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.92em;
+        }
+
+        /* 卷尾結語卡片 */
+        .epilogue-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 48px 40px;
+            margin-bottom: 60px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            text-align: center;
+        }
+
+        .epilogue-card h2 {
+            font-family: var(--font-kai);
+            font-size: 2rem;
+            color: var(--accent-red);
+            margin-bottom: 24px;
+        }
+
+        .epilogue-body {
+            text-align: justify;
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.9;
+            color: var(--text-color);
+        }
+
+        .epilogue-body p {
+            margin-bottom: 1.2em;
+            text-indent: 2em;
+        }
+
+        .fin-seal {
+            margin-top: 36px;
+            display: inline-block;
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+            font-family: var(--font-kai);
+            font-size: 1.2rem;
+            padding: 6px 24px;
+            letter-spacing: 0.3em;
+            border-radius: 4px;
+        }
+
+        /* 浮動快捷工具 */
+        .fab-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 800;
+        }
+
+        .fab-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: all 0.2s ease;
+        }
+
+        .fab-btn:hover {
+            background-color: var(--accent-red);
+            color: #fff;
+            border-color: var(--accent-red);
+            transform: translateY(-2px);
+        }
+
+        /* 響應式微調 */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 24px 16px 80px 16px;
+            }
+            .chapter-card {
+                padding: 36px 24px;
+            }
+            .front-card {
+                padding: 32px 20px;
+            }
+            .front-title {
+                font-size: 2.2rem;
+            }
+            .chapter-main-heading {
+                font-size: 1.8rem;
+            }
+        }
+    
+        .chapter-body .scene-divider { text-indent: 0; }
+        .afterword-body h3 { font-family: var(--font-kai); font-size: 1.25rem; color: var(--accent-red); margin: 36px 0 14px; letter-spacing: 0.08em; }
+        .afterword-body p { margin-bottom: 1.2em; text-indent: 2em; text-align: justify; }
+        .afterword-body ul { margin: 0 0 1.2em; padding-left: 1.6em; }
+        .afterword-body li { margin-bottom: 0.7em; text-align: justify; }
+        .afterword-body strong { color: var(--text-color); }
+
+    </style>
+</head>
+<body>
+    <div id="progress-bar"></div>
+
+    <header class="top-toolbar">
+        <div class="brand-section">
+            <button class="tool-btn" id="toggle-sidebar" title="切換章節目錄"><span class="btn-icon">☰</span><span class="btn-text">目錄</span></button>
+            <span class="brand-title">空印</span>
+            <span class="brand-badge">十章全</span>
+        </div>
+        <div class="toolbar-actions">
+            <button class="tool-btn" id="btn-font-family" title="切換字體風格"><span class="btn-icon">文</span><span class="btn-text" id="font-family-label">宋體</span></button>
+            <button class="tool-btn" id="btn-font-dec" title="字級縮小">A-</button>
+            <button class="tool-btn" id="btn-font-inc" title="字級放大">A+</button>
+            <button class="tool-btn" id="btn-theme" title="切換閱讀色調"><span class="btn-icon">🎨</span><span class="btn-text" id="theme-label">宣紙</span></button>
+        </div>
+    </header>
+
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><div class="sidebar-title">章節目錄</div></div>
+            <ul class="nav-list">
+            <li class="nav-item" data-target="ch01">
+                <a href="#ch01">
+                    <div class="nav-title">第一章：攢冊</div>
+                    <div class="nav-meta"><span>3,795 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="ch02">
+                <a href="#ch02">
+                    <div class="nav-title">第二章：水程</div>
+                    <div class="nav-meta"><span>3,951 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="ch03">
+                <a href="#ch03">
+                    <div class="nav-title">第三章：置局</div>
+                    <div class="nav-meta"><span>4,136 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="ch04">
+                <a href="#ch04">
+                    <div class="nav-title">第四章：部駁</div>
+                    <div class="nav-meta"><span>4,391 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="ch05">
+                <a href="#ch05">
+                    <div class="nav-title">第五章：倉耗</div>
+                    <div class="nav-meta"><span>5,204 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="ch06">
+                <a href="#ch06">
+                    <div class="nav-title">第六章：收冊</div>
+                    <div class="nav-meta"><span>5,021 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="ch07">
+                <a href="#ch07">
+                    <div class="nav-title">第七章：署名</div>
+                    <div class="nav-meta"><span>4,662 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="ch08">
+                <a href="#ch08">
+                    <div class="nav-title">第八章：查問</div>
+                    <div class="nav-meta"><span>5,645 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="ch09">
+                <a href="#ch09">
+                    <div class="nav-title">第九章：名單</div>
+                    <div class="nav-meta"><span>4,304 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="ch10">
+                <a href="#ch10">
+                    <div class="nav-title">第十章：藥單</div>
+                    <div class="nav-meta"><span>3,960 字</span></div>
+                </a>
+            </li>
+            <li class="nav-item" data-target="afterword">
+                <a href="#afterword">
+                    <div class="nav-title">創作後記</div>
+                    <div class="nav-meta"><span>史實與虛構的邊界</span></div>
+                </a>
+            </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="reader-container">
+                <section class="front-card">
+                    <div class="front-seal">洪武九年</div>
+                    <h1 class="front-title">空印</h1>
+                    <p class="front-subtitle">借古喻今的歷史中篇</p>
+                    <div class="meta-grid">
+                        <div><div class="meta-col-label">背景</div><div class="meta-col-val">明洪武九年（1376）空印案</div></div>
+                        <div><div class="meta-col-label">篇幅</div><div class="meta-col-val">十章，正文約 45,069 字</div></div>
+                        <div><div class="meta-col-label">附錄</div><div class="meta-col-val">創作後記：有史可據與全屬虛構</div></div>
+                    </div>
+                </section>
+
+            <article id="ch01" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 1 章</span>
+                        <span class="badge-date">3,795 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第一章：攢冊</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>五月下旬，平川府的雨停了兩日，戶房的牆根還是潮的。韓敬把最後一捆宗卷搬到窗下的長案上，解了麻繩，用袖子擦掉封皮上的霉點，一份一份攤開。紙背泛黃，有些邊角被潮氣浸得發軟，一碰便起毛。</p>
+<p>州縣報上來的錢穀文卷，一縣一束，縣下按鄉，鄉下按項：夏稅、秋糧、雜課、驛傳，各自帶著本縣的印和經手人的押。他從去年十一月看到今年三月，看過一遍，這回是第二遍，不看大處，只看每束的頭尾對不對得上，有無撕去的頁角，有無後添的小字。</p>
+<p>周進就是這時候進來的。</p>
+<p>十九歲，穿著新漿過的青布衫，進門先站住，看了看案上的紙，才問：「韓兄，知府吩咐我來搭手。」</p>
+<p>「搭什麼手？」</p>
+<p>「說是抄校。」</p>
+<p>韓敬指了指案角那一疊。「那邊是崇溪的、懷陽的，你先看他們的鄉數，同縣報上來的鄉數對不對。對得上的，用淡墨在束頭點一點，不要用濃的。」</p>
+<p>周進應了，坐下，把袖口挽了兩道。他的手很穩，翻頁不帶響，這一點韓敬一眼就看見了，也只看見這一點，便低頭去理自己的。</p>
+<p>不到半個時辰，周進抬頭問：「韓兄，這些數都要帶去京裏？」</p>
+<p>「帶宗卷，不帶數。」</p>
+<p>「怎麼說？」</p>
+<p>「冊上的數字欄是空的。」韓敬翻開旁邊那本新裱的冊子，朝他側了側，「你看，項目有，行格有，數沒有。」</p>
+<p>周進看了，沒有立刻說話，過了一會兒才問：「空著的冊，怎麼蓋印？」</p>
+<p>韓敬還沒開口，門外有人替他答了。</p>
+<p>「數在部，印在府。」</p>
+<p>曹貴站在門檻外，手裏抱著一隻黑漆的印匣，用肘彎把門又頂開些，才進來。他五十上下，背有些弓，指甲修得極短，說話聲音不高，像是怕驚動了誰。「數到部才定，部裏駁一回，改一回，要改幾回，沒人知道。可冊子要合兩縫印，一頁一頁對著縫蓋。駁回來再回府蓋，」他把印匣放在案上，騰出手，在空中比了個一來一往的樣子，「平川到京，非旬日可及。等你蓋完了再跑，局期早就過了。所以先蓋，數到了京裏再填。歷來都是這麼辦的，你問問上一任的老吏，再上一任的，都是這麼辦的。」</p>
+<p>話是對周進說的，眼睛卻看著韓敬，像是問他有沒有講錯。</p>
+<p>「曹哥說得對。」韓敬說。</p>
+<p>周進點了點頭，把頭又低下去。韓敬看他的後頸，細細的，被新領子磨紅了一道。</p>
+<p>曹貴沒有走，把印匣放平，用指頭敲了敲匣蓋：「經歷大人一會兒就到，你的冊該備好了吧？」</p>
+<p>「備好了。」</p>
+<p>「頁數我先看一遍。」</p>
+<p>韓敬把冊子遞過去。曹貴接過，不是翻，是一頁頁捻，拇指肚在頁角上一壓，聽紙的聲音。他捻得很慢，指甲縫裏還留著一點朱紅，是舊日蓋印沾上的，洗不淨。捻到第三十幾頁停了一下，抬眼看韓敬。</p>
+<p>「這頁邊上有潮斑。」</p>
+<p>「看見了，邊上，不傷格。」</p>
+<p>「潮了，印就不好壓。」曹貴把那一頁抽出來，對著窗光，看過，又插回去，「壓得住。你記著，過會兒蓋到這裏我慢些，你別催。」</p>
+<p>「不催。」</p>
+<p>經歷到的時候，天已過午，窗外的光從白轉黃，案上的紙影斜過去一截。他是個矮胖的人，穿一件半舊的官袍，進門先打了個噴嚏，嘟囔一句這屋子潮，便在案側坐下，把一方小硯拉到自己手邊。他的差事是對同：印蓋在哪裏，他看一眼縫對不對，在冊腳畫一個小小的押，便算過了。</p>
+<p>曹貴開匣，取出印，雙手捧著，先在掌心哈了口氣，又拿一方乾淨的帕子把印面擦過一遍，才蘸色。他蓋印的樣子韓敬看了十年，每次都像第一次：手腕不用力，只是把印按下去，數一個數，再提起來。印提起時，紅色的字是整的，不洇，不缺，紙上留下半個圓。他把下一頁推過去，對上縫，再按。</p>
+<p>韓敬站在案子的另一頭，兩手垂著，沒有動。他的身分是攢造，冊子經他手攢成，印卻不是他的事。印匣從印房出來，到這間屋子，再回印房，中間他一直沒有碰過匣子，連匣角都沒有碰。這是規矩。</p>
+<p>蓋到第三十二頁，曹貴果然慢了，印按下去，等了兩數，才提。韓敬沒有催，看著那一頁的邊上，潮斑在紅色底下洇開一點淡影，印面壓過去，還是端端正正落住了。</p>
+<p>「對得上嗎？」他問經歷。</p>
+<p>經歷湊過去，瞇著眼：「縫是對的。」說著，在冊腳畫了個押。</p>
+<p>蓋完整冊，曹貴把冊子合上，攤開左手，再取備換頁。這一疊是另備的，厚薄與冊頁一般，行格一般，也是空的數字欄，一頁一頁，他單獨放在帕子上。</p>
+<p>「備換，」他說，「要蓋？」</p>
+<p>韓敬道：「蓋。」</p>
+<p>「蓋幾頁？」</p>
+<p>「往年備幾頁？」</p>
+<p>曹貴沒有直接答，把頭轉向經歷。經歷想了想：「六頁罷。多了，你也用不著。」</p>
+<p>韓敬本想說，路上的事難料，七頁穩妥些，嘴剛張開，曹貴先說了：「六。我們這裏蓋印，有一頁記一頁，底簿上要寫清楚。多蓋一頁，底簿上就多一筆，要同冊子一頁一頁對上。」</p>
+<p>「你說得是。」韓敬把話嚥了回去。</p>
+<p>曹貴一頁頁蓋，蓋完一頁便抽出來，放在左手邊，嘴裏數著，聲音極低：「一。二。三。」到六，把六頁疊齊，在案上輕輕磕了磕，又按頁角，從頭到尾再數一遍。數完，抬眼看經歷：「六頁。」</p>
+<p>經歷點頭：「六。」</p>
+<p>曹貴取出底簿，這是一本薄薄的小冊，封面空白，只有他看得懂的記號。他把筆舐了舐，記：某月某日，備換頁六，用印畢，付攢造韓敬。寫完，推到經歷面前，經歷又畫一個押。</p>
+<p>「付攢造韓敬」，這幾個字曹貴寫得比別的字重，筆鋒壓進紙裏。韓敬站在案子另一頭，看著那五個字，沒有說話。</p>
+<p>周進一直沒有出聲，這時才小聲問：「若是少了一頁，會怎樣？」</p>
+<p>曹貴笑了，是頭一回笑：「怎樣，倒不會怎樣。有一頁記一頁，底簿上對得上就行。」</p>
+<p>韓敬沒有接話。他把備換頁拿過來，一頁一頁翻，翻到末頁，數了數，也是六。</p>
+<p>冊子與備換頁蓋完，輪到他自己。曹貴把筆遞過來，指著冊末那一行空處：「攢造的署，你寫。」</p>
+<p>那行字上方是印好的格：某府某年錢穀冊書，攢造某人。底下留白。韓敬接過筆，在硯上舔了舔，蘸得不多，寫「攢造　韓敬」四個字。他的字不好看，筆畫直，每一豎都往下拖了一點，是在鄉學裏被先生敲過手心的毛病，改了二十年也沒改掉。寫完，擱筆，吹了吹。</p>
+<p>頁上的名只有這一處是現在就定下的：這冊是他攢的。他看著那四個字，覺得和往年寫的沒有什麼不同，年年寫，也沒有哪一年特意看過它。</p>
+<p>收拾完，經歷拍拍袍子起身，說了句潮氣重，宗卷別堆在牆根。曹貴抱著印匣走了，門在身後輕輕合上。屋子裏忽然靜了，周進還在對鄉數，筆尖碰紙的聲音，細細的。</p>
+<p>韓敬在案邊站了一會兒，從懷裏摸出那本小簿。藍布面，邊角已磨白，是三年前冬天在街口買的，一文錢兩本，另一本早用完了。他翻到最後一頁有字的地方，上面是他自己的筆跡：</p>
+<p>「五月十七，當歸二錢，黃耆三錢，白朮兩錢，付藥鋪二百一十文，欠四十。」</p>
+<p>「五月二十，同方，付一百八十，清。」</p>
+<p>他提筆，在下面添了一行：「五月二十三，備換六，曹。」</p>
+<p>寫完，看了看，又覺得不全，在後面加了「用印畢，經歷對同」。字小，擠在行末。他把簿子闔上，放回懷裏，貼著中衣。</p>
+<p>周進抬頭看了一眼，沒問。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>高謙叫他是在申時。</p>
+<p>府堂後面的小廳，窗開著，簷水還在一滴一滴落。高謙坐在案後，面前攤著一份剛寫好的文引，墨還沒乾透。他五十出頭，兩鬢白得早，眼下有一道淺淺的褶，說話前習慣先把茶盞端起來，不喝，又放下。</p>
+<p>「冊攢好了？」</p>
+<p>「印已蓋畢，備換頁六頁，曹貴點過，底簿有記。」</p>
+<p>「嗯。」高謙看著那份文引，用指背在紙邊敲了兩下，「你的文引寫好了，你看看。」</p>
+<p>韓敬雙手接過來。文引不長：某府吏韓敬，持錢穀冊書一部、備換頁六、宗卷若干，赴京局繳納，沿途關津驛站驗放；末尾有一行小字：回程須府批。後面是年月，是府印。印是紅的，新的，邊緣清楚。</p>
+<p>他把「回程須府批」這一行看過去，同往年的一樣。「看過了。」</p>
+<p>「那就好。」高謙取回文引，晾在一旁，「這回你去，我與同知、倉裏的杜大使隨後也進京，各有各的事，局上見。有一點，你路上謹慎，宗卷、冊、備換頁，三樣都在你身上，丟了哪一樣，我這裏不好交代。」</p>
+<p>「是。」</p>
+<p>高謙又端起茶盞，這次喝了一口，才說：「還有件事。周進，你認得吧？」</p>
+<p>韓敬站著沒動。「戶房新來的那個，方才在我那裏對鄉數。」</p>
+<p>「他父親周某，與你是舊識。」</p>
+<p>「是。」</p>
+<p>「他託過我，也託過你。」高謙把茶盞放下，語氣放得平，「上個月他來府裏，說兒子年輕，沒出過遠門，既然進了房，總要見見世面，局上的事跟著看一遍，往後少走彎路。他說話時順口帶過一句，前年借給你家的那一貫錢，他說不急，叫你別記掛。我說，這要看韓敬願不願。」</p>
+<p>韓敬沒有立刻答。</p>
+<p>他認得周進的父親，認得很久了。前年冬天，母親的咳喘犯得厲害，藥一日兩帖，家裏的錢過了年關就見底，他去借，鄰里能開口的都開口了。周某那時還在鄉裏管糧的，沒說二話，從櫃裏取了三貫，說用完再說。後來他還了兩貫，剩下一貫，說是過了春，過了春，又過了秋。周某沒有提過一回，連面也不紅，見了面還問老太太的咳好些沒有。</p>
+<p>可他不想帶這個年輕人。理由他自己數得清：路遠，多一個人，多一份盤纏，多一張嘴；周進手穩，字也乾淨，可他沒有出過差，不知道局裏的規矩，不知道局裏的吏要怎麼說話；最要緊的，他不想在自己身邊多一個人。他幹了這些年，吃的是一碗不容出錯的飯，出錯的時候，身邊人越少越好。</p>
+<p>「大人，」他說，「路上辛苦，局上也緊。他頭一回，怕拖累。」</p>
+<p>高謙沒有生氣，笑了笑：「拖累不拖累，你比我清楚。他手穩，我看過他寫的東西。局裏要抄要校，有個人搭手，你自己也省些力氣。」</p>
+<p>「是。」</p>
+<p>「你要是真不願，我去回他父親。」高謙說，「只是你要想，他父親那一貫錢，也不是我借的。」</p>
+<p>這句話說得輕，像是無意間帶出來的，韓敬卻聽得明白：高謙知道那一貫錢。這種事在府裏瞞不住，他也沒打算瞞。</p>
+<p>他把文引放回桌上，吸了口氣，說：「我帶他去。」</p>
+<p>「好。」高謙點點頭，似乎有點如釋重負，又似乎沒有，「路上你照看著些。他是孩子，你是長輩。」</p>
+<p>「是。」</p>
+<p>出了小廳，簷水落在他的肩上，涼得發緊。他站在廊下，往院子那邊望，周進正從戶房出來，兩手捧著一疊抄好的紙，走得很小心，生怕踩著水坑。看見他，停了一下，把紙護在懷裏，點頭：「韓兄。」</p>
+<p>「收拾行李罷，」韓敬說，「後日一早起程。你帶兩件夾衣，夜裏船上冷。」</p>
+<p>周進眼睛亮了一下：「是，我知道了。」</p>
+<p>他轉身跑開，鞋底踩進水坑，濺了一腿泥，自己也沒覺察。</p>
+<p>韓敬在廊下又站了一會兒，才把手伸進懷裏，摸到那本小簿，按住，沒有拿出來。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>回戶房，天色已暗。曹貴等在那裏，身邊還站著兩個雜役，抬著一隻新做的樟木箱，箱蓋斜靠在牆上。新木的氣味很衝，蓋過了屋裏的霉味，油燈下，箱角的銅片亮得有些刺眼。</p>
+<p>「箱子是庫上撥的，」曹貴說，「裝冊子與備換頁，驛上都認得。」</p>
+<p>韓敬把冊子取出，用油紙包了，放進箱底；備換頁六頁，單獨用另一層紙包了，放在冊上，又壓一方細布。宗卷太多，另裝兩只竹篋。曹貴站在邊上看，沒有伸手，只在他裝完以後，開口：</p>
+<p>「數一數。」</p>
+<p>「冊一。備換頁，」韓敬把油紙揭了一角，一頁頁點過去，「一、二、三、四、五、六。」</p>
+<p>「六。」曹貴說，「同底簿對得上。」</p>
+<p>他朝雜役擺擺手，雜役抬起箱蓋，扣上。曹貴從袖中取出一條封紙，在箱縫上橫貼了，又喚人去請同知袁大人來加封記。同知到時還披著外衣，像是剛從後堂起來，只看了一眼箱縫，在封紙上寫了日子，畫了押，什麼也沒問，便回去了。</p>
+<p>這一串動作，韓敬從頭看到尾。他只是站著，看，然後在箱子旁邊蹲下，把繩子穿過去，打了個結。</p>
+<p>曹貴抱起印匣，要走，臨出門又回頭：「這回去京，數你自己填。」</p>
+<p>「是。」</p>
+<p>他說完，推門走了。</p>
+<p>屋裏只剩下箱子、竹篋，與一盞剛點上的油燈。韓敬把文引折好，收進貼身的布袋，與小簿放在一處。</p>
+<p>他坐下來，把今日的事在心裏過了一遍：冊，備換頁，宗卷，文引，四樣；印留在印房，鎖在匣裏，匣在曹貴手上；周進，一個十九歲的孩子，後日隨他走。</p>
+<p>兒子昨夜抱著他的腿，問他去多久。他說，辦完就回。</p>
+<p>他想著該寫一筆，又覺得沒什麼可寫，伸手去摸懷裏，摸到的是一本藥帳。母親這個月的藥，還差一帖。</p>
+<p>窗外簷水停了。他吹了燈，出門，把戶房的鎖落下。</p>
+<p>鎖舌合上的時候，發出一聲輕響，院子那頭，不知哪一間屋子裏，有人在數更。</p>
+                </div>
+            </article>
+            <article id="ch02" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 2 章</span>
+                        <span class="badge-date">3,951 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第二章：水程</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>起程那日天沒亮，碼頭上的石階還是濕的。</p>
+<p>船是一條窄長的槽船，艙裏鋪了蘆席，頂上是竹篷，篷邊縫過幾回，針腳不齊。韓敬指著艙中間那塊地方，叫兩個挑夫把樟木箱放下，箱縫上的封紙朝上，同知的押還在，墨色發烏，邊上沒有起翹。竹篋兩只，一左一右夾住箱子。他自己的鋪蓋攤在箱旁，睡下去，翻身便碰得到箱角。</p>
+<p>周進抱著包袱站在岸上，不知該不該先上。船夫說了一句什麼，他才踩著跳板過來，腳底一滑，被韓敬抓了一把胳膊。</p>
+<p>「看水，別看腳。」</p>
+<p>「是。」</p>
+<p>他在艙裏坐下，兩手擱在膝上，坐得端端正正，像是等人考問。韓敬把文引從布袋裏取出來，看過，又收回去。船夫撐篙，岸邊的石階退開，舊日的屋脊一排排沉到水面底下去，天才慢慢透出灰白。</p>
+<p>頭十來日是雨。江西行省境內的水路，到了這個時節，雨不大，卻不肯停，篷頂一整日都是細密的敲打聲。船夫夜裏不敢行，傍晚便尋一處灣口泊了，在岸邊生火煮飯。韓敬照例先把兩只竹篋拖到篷下最乾的地方，伸手探探底，確定沒有滲水，才肯吃飯。周進吃得快，吃完便把碗在江水裏涮了，涮兩遍，擱在船頭晾著。</p>
+<p>「你家裏，」韓敬問，「頭回出這麼遠？」</p>
+<p>「去過一回府城。」</p>
+<p>「府城不算。」</p>
+<p>周進笑了笑，沒有分辯。</p>
+<p>過了第三處閘，船在一個大些的碼頭靠了岸，說是要等一個同路的客。韓敬原以為是商人，上來的卻是一個瘦老頭，背微駝，一個布包斜挎在肩上，另一手抱著一只油布裹著的長匣，匣口用麻繩紮了三道。他踏上跳板，先把長匣遞給船夫，叫他放平，才自己上船，動作慢，一步一步，像是在試板子結不結實。</p>
+<p>「瑞陽府的許某，」他坐定了，朝韓敬拱手，「也是去局上的。船錢分我一半，省得我另雇。」</p>
+<p>他缺了一顆門牙，說話有點漏風。韓敬報了自己的姓名和府名，指指周進，說是同房的。許老吏瞇眼打量周進，又看箱子，目光在封紙上停了停，隨即移開，去看水。</p>
+<p>「新蓋的箱。」</p>
+<p>「庫上撥的。」</p>
+<p>「樟木好，不蛀。」他說完，不再問，把長匣抱到自己膝上，用袖子擦了擦匣角的水氣。</p>
+<p>這一路上，韓敬漸漸摸清了他的性子。許老吏白日多睡，一睡便是半個時辰，頭靠在匣上，嘴微張，睡著了手也不鬆。醒了，要茶，要熱水，要問船夫前面有沒有灘。他說他六十了，這條水走過不下十回，哪處有淺灘，哪處閘官愛挑刺，他閉著眼都曉得。</p>
+<p>雨停的那個下午，篷布捲了起來，日頭斜照進艙，水面白得晃眼。周進把半邊宗卷搬到船頭，在席上攤開，一束一束地看。</p>
+<p>韓敬昨夜就同他說過了：崇溪、懷陽兩縣，你在府裏已經對過；其餘各縣的鄉數，同縣報上來的總數，路上再對一遍。對得上，淡墨點一點束頭；對不上，不要改，不要問，把那一束單放出來，給我看。</p>
+<p>周進此刻便照做。他不用算盤，用指頭點著行格，從上往下，一行一行，嘴唇輕輕動，數到末了，眼睛一抬，同束頭上寫的總數一對，便抓起細筆，在束頭角上點一個淡墨的小點。點完，翻下一束。一頁是一頁，沒有回頭。</p>
+<p>韓敬坐在艙口，假裝看水，眼睛卻一直在他手上。半個時辰過去，周進面前左邊那堆已經點好的，比韓敬自己一個時辰能弄完的還厚。有兩束他單放在一邊，墊了一張草紙，紙上不寫字。</p>
+<p>「這兩束是？」</p>
+<p>「鄉數同總數差了一個。」周進說，「我再數了一遍，還是差一個。」</p>
+<p>韓敬接過來，翻開，是一個鄉的戶數抄錯了筆畫，把「六」寫成了「五」，並不是數目真的錯。他把那一頁撫平，說：「這是原卷抄的人手滑，不要緊，我記著。你這樣的手，府裏怎麼沒人用？」</p>
+<p>「我才進去三個月。」</p>
+<p>「對，你是才進去。」</p>
+<p>他把兩束退回去，周進接過，重新排進那一堆。這個孩子的字乾淨，數也準，手腕輕，一點也不顯力氣，韓敬看著，只覺得這回差事裏，這一樁總算是放心的。</p>
+<p>許老吏不知何時醒了，從匣上抬起頭，瞧瞧周進，又瞧瞧韓敬，嘴角往下彎了彎：「這孩子是塊好料。」</p>
+<p>「頭回出門。」</p>
+<p>「頭回的才好。」他說，「慣了的，手也慣，眼也慣，什麼都看一眼就過了。」</p>
+<p>韓敬沒有接。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>那天夜裏船泊在一處沙洲旁，風小，江上沒有別的船。周進把當日的束子點完，把筆洗了，倒頭便睡，枕著自己的包袱，呼吸很快就勻了。許老吏的鼾聲從艙另一頭傳來，一長一短，像是拉風箱。</p>
+<p>韓敬點起油燈，把燈罩往下壓低，只讓光落在自己膝前。</p>
+<p>他早就打算在路上做這件事。宗卷是他一路帶的，但府裏攢冊時忙，只看了每束的頭尾，到京之後局上要點，數若對不上，是他的事。他從竹篋裏取出呈報單。這是府倉報上來的收數，一張紙，記著各項糧數，是宗卷裏的一項。他又把各縣解數的那一束一束捧出來，攤在席上，一縣一縣把各縣的解數記下，再與呈報單的收數對。</p>
+<p>算盤他不敢撥，怕驚醒了人，便用筆在草紙上一豎一豎地寫，加完一縣，再加一縣。燈花爆了一下，他等它落定，接著往下算。縣解合計，三萬一千二百四十石。他又從頭加了一遍，仍是三萬一千二百四十。</p>
+<p>呈報單上的倉收數，三萬一千零零三石。</p>
+<p>他把兩個數字並排寫在紙邊上，隔得近，看得很清楚。倉少收了二百三十七石。</p>
+<p>他先想到的是算錯了，把草紙翻過去，重新算一遍，還是這個數。再看解數那一束，有沒有哪一縣重記或漏記，也沒有。他又把呈報單翻過來，背面是空的，沒有批註，沒有小字，沒有補記。</p>
+<p>二百三十七石。</p>
+<p>他坐著，把筆擱在硯邊。江水在船底輕輕拍。</p>
+<p>他在戶房這些年，聽人說過，糧入倉，從縣裏起運，到府倉過斛，路上要折，倉裏存放要折，鼠雀也要吃掉一些，年底算帳，大差不差。二百三十七石，在三萬多石裏頭，不算多。他猜是折耗，卻說不準，也許是哪一縣的袋子漏了，也許是過斛時多量了，也許另有他想不到的緣故。紙上不寫，他就不知道。</p>
+<p>府倉歸倉大使管，倉大使姓杜，是同鄉，同在一條巷子裏長大的。杜家的屋檐，同他家的屋檐只隔一道矮牆，小時候兩家的雞飛來飛去。他想起這一層，心裏並沒有覺得更踏實，倒覺得有一點沉。</p>
+<p>「韓兄。」</p>
+<p>他的手一抖，把草紙壓在掌下。周進坐起來了，不知醒了多久，睡眼惺忪，頭髮亂著，看他。</p>
+<p>「韓兄有事？」</p>
+<p>「沒有。」韓敬說，「數多，累了。」</p>
+<p>「我來幫你。」</p>
+<p>「不用，你睡。」</p>
+<p>周進還坐著，眼睛在他臉上停了一會兒，又移到他壓在手底下的那張紙上。韓敬把手掌攤開，露出那張紙，紙上只有一豎一豎的算道，兩個數字被他疊在另一張紙下面。他把呈報單拿起來，折兩折，放進竹篋，扣上蓋。</p>
+<p>周進沒有再問，躺了回去，翻身朝著船舷，呼吸卻沒有立刻勻下來。</p>
+<p>韓敬坐了一會兒，從懷裏摸出小簿。藍布面，邊角磨得更白了。他翻到最後有字的那一行，是五月二十三日寫的：「備換六，曹，用印畢，經歷對同。」他把筆蘸了蘸，在下面另起一行，寫下小字：</p>
+<p>「六月初六，二百三十七。」</p>
+<p>寫完，吹了吹，闔上，放回懷裏。</p>
+<p>他起身走到箱旁，彎腰看箱縫。封紙貼得服服帖帖，同知的押還在，繩結是自己打的那個，沒有動過。他回來，吹了燈。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>第二天是個陰日，江面起了點風，船夫升了半幅帆，船走得快些。韓敬一早起來，去看竹篋的繩結。周進在船頭刷牙，背對著他。</p>
+<p>許老吏坐在艙裏，剝一個煮熟的蛋，剝得很慢，碎殼都攏在手心裏。</p>
+<p>韓敬在他旁邊坐下，看了一會兒江，隔了半晌才開口：「許老，你們瑞陽的冊，往年到了局上，可遇過駁？」</p>
+<p>許老吏把蛋放進嘴裏，抿了一會兒，才慢吞吞地說：「年年駁。冊子遞上去，局裏的吏不看你人，只看你冊，翻到哪一頁，數同宗卷對不上，便是一張單子，叫你改。你問改什麼，單子上寫著。你問為什麼不早說，早說了你的冊就不是冊了。」</p>
+<p>他說得很平，像是在講一件別人的事。</p>
+<p>「冊上的數，本就是到了局上才定。印是在府裏先蓋好的，數空著，到了部裏看人的帳，看你的宗卷，再填。填上了，局吏嫌這一處那一處，便退。退回來，改，換上備好的頁就是。」</p>
+<p>「往年你自己遇過？」</p>
+<p>「遇過。」許老吏想了想，「早些年，我府裏那一回，駁了三處。兩處是縣裏報得糙，一處是庫裏收得糙。那一年我還肯寫信，想著老實，先寫信回去稟知府，說這冊有問題，請示怎麼辦。信才寄出去，局上的單子已經下了。知府回信一來，把我罵了一頓，說這樣的小事，你還來問我？又把庫上的人叫去訓，庫上的人恨我，說是我告了他。」他嚥了口蛋，又笑了一下，「單子照樣要改，改完，我兩頭不是人。打那以後我就明白了，局上駁的，你自己在局上改。先稟了，倒成你報的。」</p>
+<p>「倒成你報的。」韓敬重複了一遍。</p>
+<p>周進這時從船頭回來，頭髮濕著，聽見最後半句，在艙口坐下，問：「許老，那要是局上沒有駁呢？」</p>
+<p>「沒有駁，就收了。」</p>
+<p>「那不是更好？」</p>
+<p>「更好。」許老吏看著他，像看一個說了傻話的孩子，「可是沒有哪一年是更好的。」</p>
+<p>韓敬把視線轉向江面。風把一片葉子吹到船舷上，貼了一會兒，又滑進水裏。</p>
+<p>「往年駁的，」他說，「多是哪一類？」</p>
+<p>「什麼都有。」許老吏答得很快，「有的縣裏糙，有的庫裏糙，有的是人手滑。」</p>
+<p>韓敬沒有動。</p>
+<p>「所以我說，駁了再說。」許老吏眼睛仍看著水。</p>
+<p>「許老，」周進笑著說，「你這是在教我們？」</p>
+<p>「我不教人。」許老吏把蛋殼放在膝上，慢慢數出一個一個碎片，「別人的事，我不問，也不想被問。我自己的冊還捆在匣裏，一頁沒看過，也不打算看。我老了，不想攪進別人的事。」</p>
+<p>他說得不重，說完，把匣往懷裏攏了攏，靠上去閉了眼睛。</p>
+<p>韓敬沒有再問。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>船在傍晚進了一座大閘。閘前排著七八條船，一條接一條，等閘官放水。韓敬站在船頭看，周進在他身後，把兩只竹篋重新排過，讓重的那只靠著箱子。</p>
+<p>天黑時才輪到過閘。閘下的水位一落，船身便往下沉，岸上的磚牆從頭頂壓過來，帶著苔氣。出了閘，天已經全黑，船夫點了燈籠，掛在篷柱上，光搖晃著，在水上拖出一長條。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>又過了幾日，消息是在一處驛碼頭傳來的。</p>
+<p>船靠岸補水，船夫上岸買米，回來時帶了一個消息，說是驛上有人傳，朝廷改了制，行省不叫行省了，改叫布政使司，官也換了稱呼，下頭的衙門也要跟著換匾。說是這個月裏的事。</p>
+<p>周進先抬起頭：「那咱們的冊，封面上寫的是『江西行省』。」</p>
+<p>「寫的是舊稱。」韓敬說。</p>
+<p>「那要不要換？」</p>
+<p>許老吏正蹲在船尾吃一塊乾餅，聽見了，頭也沒回：「換什麼？局上收冊，認的是印，不認匾。你這個名兒，到了局上，自有人給你改，改不改都收。」</p>
+<p>「真的？」</p>
+<p>「我走這條水走了十來回，換過兩回名，哪一回見過退冊的？」許老吏咬了一口餅，嚼得很慢，「這幾年改來改去的，改的是上頭的事。到了咱們這兒，是紙，紙上的字，還是那幾個字。」</p>
+<p>周進想了想，像是放了心，又問：「那咱們往後，是叫『布政使司』了？」</p>
+<p>「口裏愛叫什麼叫什麼。」許老吏說，「我還叫了幾十年行省呢，不也過來了。」</p>
+<p>船夫在岸邊喊，說是水補好了，要開船。韓敬沒有立刻上跳板。驛屋門口坐著一個驛卒，在補一雙草鞋，他走過去，問：「平川府，從這裏遞封信去，要幾日？」</p>
+<p>驛卒頭也不抬：「同你這船差不多。」又說：「平川的老爺們，這幾日都在路上，送去也是擱在府裏案頭。」</p>
+<p>「是。」韓敬說。</p>
+<p>他站了一會兒，驛卒的錐子一下一下穿過鞋底。他沒有再問，轉身上了跳板。</p>
+<p>船離了岸，他想起冊子封面。那一行字，是他自己用小楷寫上去的。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>再往下，水面寬了，兩岸的山退得很遠，天色從早到晚都是一樣的白。船有時順風，有時逆風，晚上泊在哪一處，韓敬已記不清楚。</p>
+<p>周進仍每日對鄉數。末一束點完那天，他把細筆在硯邊颳乾淨，把全部宗卷理齊，一束一束放回竹篋，放得比韓敬還整齊。他把那兩束單放的也一併放回去，墊著草紙，抬頭問：「韓兄，都對完了。那兩束要不要再理？」</p>
+<p>「不用。」</p>
+<p>「那我給你看過？」</p>
+<p>「不用，我看過了。」</p>
+<p>周進「哦」了一聲，把竹篋蓋好，扣上。他這回沒有看韓敬的臉，只是低著頭，用手指把扣環拉了拉，確定扣緊了，才起身去船頭。</p>
+<p>傍晚，船夫說再過兩處彎，就是京畿的水路了。許老吏睡醒了，把油布長匣抱到膝上，一道一道解開麻繩，又紮回去，紮得同原來一樣。韓敬看著他，忽然想問一句，你的冊子裏，有沒有一處你也沒底？他沒有問。</p>
+<p>他坐到艙口，從懷裏摸出小簿，翻到那一行，看了一眼，沒有再添字。藥帳還差一帖，是他出門前沒來得及補的。他把簿子闔上，放進貼身的布袋，與文引壓在一處。</p>
+<p>箱縫上的封紙，在最後一抹天光裏還是灰白的。</p>
+<p>他把竹篋往箱邊又推近了一寸，靠著它，閉上眼睛。船底的水聲一下一下，到天黑也沒有停。</p>
+                </div>
+            </article>
+            <article id="ch03" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 3 章</span>
+                        <span class="badge-date">4,136 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第三章：置局</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>進城那日是七月初，天熱，蟬在城牆根的樹上叫得一刻不歇。</p>
+<p>街上的人比平川的集日還密，挑擔的、推車的、趕驢的，都往一個方向擠，叫賣聲一層壓著一層。</p>
+<p>船泊在水門外，韓敬雇了兩個挑夫，一個扛樟木箱，一個挑兩只竹篋。他自己走在箱子旁邊，不叫挑夫換肩，也不許放下，過橋時看著腳下的石縫，過門洞時側了身，怕箱角蹭牆。周進跟在後面，背著兩人的包袱，走幾步便停一下，仰頭看城樓，又趕緊低頭跟上。</p>
+<p>許老吏在水門口同他們分了手。他說他在城東有個熟店，住慣了的，不順路。抱著那只油布長匣，一手扶著腰，慢慢走進人群裏，沒有回頭。</p>
+<p>韓敬早在船上問過船夫，城西靠近水關的地方客店便宜。他挑了一家門面最窄的，掌櫃坐在櫃後打算盤，抬頭看了看他們肩上的行李，報了房錢。有單間，也有大些的，兩人合住的。韓敬在心裏撥了一遍：兩間房的錢，夠母親四帖藥。掌櫃把算盤一推，等他回話，他又問了一遍每夜是多少，才應下。</p>
+<p>「一間，」他說，「兩人。」</p>
+<p>周進在他身後沒有出聲。</p>
+<p>房在樓上，窄，頂上有一根橫梁，低得韓敬進門要偏頭。兩張板鋪靠牆，中間隔一條走道，勉強放得下那只樟木箱。窗框有些歪，推開要先往上抬一抬。窗對著後巷，巷裏晾著別人家的衣裳，滴著水。挑夫放下箱子，韓敬照例蹲下去看箱縫。封紙完好，同知的畫押還在，只是邊角被汗氣潮得略有些軟。</p>
+<p>他直起身，對周進說：「明早去局上。你把衣裳換件乾淨的。」</p>
+<p>「是。」周進說，過了一會兒又問，「韓兄，局上……要怎麼說話？」</p>
+<p>「少說。問什麼答什麼。」</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>戶部置的局，設在衙門西廊下，臨時用木板隔出的一排棚屋，一眼望過去全是窗。每個窗前都排著人，有的抱著冊匣，有的扛著竹篋，也有的什麼也沒拿，只握著一張文引，在日頭底下站著。窗內的吏坐著，只露出半截身子和一只手，手在紙上動，筆尖沙沙響。廊下一股陳墨與汗氣混著的味道，被日頭蒸得發悶，各窗前的人都拿袖子或帽沿扇著風，扇也沒用。</p>
+<p>韓敬到的時候，天剛亮不久，隊已經排到了廊外。他把箱子交給挑夫看著，自己站在末尾，周進站在他側後。</p>
+<p>前面隔著兩個人，有人轉過頭來，看見箱子，又看他腰間的文引袋，笑了笑：「哪一府的？」</p>
+<p>「平川。」</p>
+<p>「江西的？我臨水府，姓邵。」那人五十上下，臉黑，嘴邊兩道深紋，一件舊布袍洗得發白，肩上搭著一條汗巾，像是在這裏站了不止一天，「頭回？」</p>
+<p>「不是頭回。」</p>
+<p>「那你曉得。」邵吏用汗巾擦了把脖子，「今年人多。我來了有些日子，各府的人一撥一撥地到，收件的窗就那麼幾扇。你看那邊，」他用下巴指了指，「靠東頭第二個窗，午後換人，換上來的那位手慢，你要是在他的窗前，就帶口乾糧。靠西頭的，愛挑冊角，一個角折了，他要你捋平了再來。中間這幾個還好。」</p>
+<p>「多謝。」</p>
+<p>「謝什麼，站著也是站著。」邵吏笑，露出被茶漬染黃的牙，「上頭催得緊，我聽裏面的吏說，這局『有如星火』。可你看這隊，星火也燒不快。局期要等省裏、部裏合了數才定，催的是我們，定的不是我們。」</p>
+<p>隊慢慢往前挪，一步只挪半步。周進站不住，把腳換了幾回，鞋底在青磚上蹭出沙沙的聲音，韓敬低低咳了一聲，才不動了。邵吏看見，從袖子裏摸出一小包鹽炒的豆子，遞過去：「吃兩顆，壓暑。」周進看韓敬，韓敬點頭，他才接了，道謝。</p>
+<p>他們前面是一個年輕的吏，抱著冊匣，站到窗前，把文引遞進去。唐照例念一遍，叫人抬進竹篋，一束一束點過去，點到末了，手停住了。</p>
+<p>「文引上寫十二束，這裏只有十一束。」</p>
+<p>「路上……」年輕的吏臉漲紅了，「許是落在船上了，我回去找。」</p>
+<p>「點不齊，我不收。」唐說得沒有火氣，也沒有商量，把竹篋蓋上，推出窗來，「找齊了再來，還是從末尾排起。」</p>
+<p>年輕的吏抱著竹篋退出去，背後的人跟著往前挪了一步，廊下的蟬聲一陣緊似一陣。</p>
+<p>日頭升到廊檐上頭，影子縮回腳邊。輪到他們的時候，已近午時。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>窗內的吏三十多歲，生得方正，袖口磨得發亮。右手食指與中指的指肚，染了一層洗不掉的墨色，像是兩粒小小的墨丸，韓敬看著，想起曹貴指縫裏洗不淨的那點朱紅。他沒有抬頭，伸出手說：「文引。」</p>
+<p>韓敬雙手遞上。</p>
+<p>他展開，從頭看到尾，嘴裏輕輕念：「平川府吏韓敬，持錢穀冊書一部，備換頁六，宗卷若干……」念到「備換頁六」，頓了一頓，才往下，「好。」他把文引遞還給韓敬，「收好。我姓唐。局裏收冊，先點宗卷，再點冊。宗卷在哪裏？」</p>
+<p>「兩只竹篋。」</p>
+<p>「抬進來。」</p>
+<p>挑夫把竹篋從窗側的小門抬入，放在案前的地上。唐起身，拉過一張矮凳，蹲下去，揭開篋蓋。</p>
+<p>他點宗卷的方式，韓敬在府裏沒有見過。他不翻頁，不看內容，只一束一束拿起來，看束頭的簽，報一個件數，手邊另有一個小吏執筆，隨他的聲音在簿上畫。拿起，看，放下，換一束。竹篋底下壓著府倉的呈報單，是用細繩單紮的一束，他拿起來，看了看束頭，同別的束一樣報了數，便放回去。</p>
+<p>點完，他蓋上篋蓋，把筆接過來，自己在簿上添了一行，核對了兩邊的數，才直起腰，用袖子拭了拭手。</p>
+<p>「束數點齊了。宗卷我只點件數，數不核。核是後面的事。」</p>
+<p>「是。」</p>
+<p>「冊在箱裏？」</p>
+<p>「在箱裏。」</p>
+<p>「箱封是府裏封的？」</p>
+<p>「是。同知畫的押。」</p>
+<p>唐示意挑夫把樟木箱抬進來，放在案上。他繞著箱子走了一圈，看四個角，看銅片，看箱縫上的封紙。他把頭低下去，湊近了看那一行日期，又看那個押字。他看得很細，同曹貴捻紙一樣細，只是沒有聲音。</p>
+<p>「日子是五月二十三。押字是同知的，紙邊沒有翻起來的地方。繩結呢？」</p>
+<p>「我打的。」</p>
+<p>「沒動過？」</p>
+<p>「沒有動過。」</p>
+<p>唐點了點頭，從案抽屜裏取出一把薄刃的小刀，在封紙上一劃，輕輕一揭，紙分成兩半，粘著箱縫的兩邊各留著半截押字。他把兩半封紙攤在案上，用鎮紙壓了，才解繩，掀蓋。</p>
+<p>箱裏的樟木氣味湧出來，蓋過了案上的墨味。韓敬站在窗外，看著上面壓著的細布，細布下面單獨包著的一疊，是在平川府戶房，曹貴一頁一頁數過的。</p>
+<p>唐先揭開那方細布，取出下面單獨包著的一疊，擱在案右，不拆。再揭油紙，取出冊，捧在手上，看封面：「江西行省，錢穀冊書。」他念，「如今該叫布政使司了。冊面不用動，局簿上我寫新稱。」翻開，一頁一頁地過。他翻得很快，只看縫上的印，看有沒有缺，有沒有洇，一面翻一面用指頭輕輕點過頁邊。</p>
+<p>翻完，他把冊合上，用手掌按平，說：「數字欄全空，行格齊整，印在縫上。」又問：「填數的筆，自備，還是用局裏的？」</p>
+<p>「自備。」</p>
+<p>「墨用淡些的，濃了洇。」他說完，把冊放在案左，拆開案右那一疊的紙包，一頁一頁，數：「一，二，三，四，五，六。」</p>
+<p>他抬眼看韓敬：「六頁，同文引相符。」</p>
+<p>「是。」</p>
+<p>「備換頁預蓋了印，這個我曉得，各府都有。本局收冊，暫存。你這一部，冊與備換頁，今日先放在局裏，明日你來填數。」</p>
+<p>他轉身，向旁邊的小吏要來一本簿子。那簿子封皮是黑的，邊角已經翻毛，攤開來，是一格一格的表，府名，持冊吏，寓所，冊，備換，日期。他蘸了蘸筆。</p>
+<p>「府名，平川。持冊吏，韓敬。」他一邊寫一邊念，字小而齊，每一畫收得極乾脆，「備換，六。」</p>
+<p>筆尖到了「寓所」那一格，停住。</p>
+<p>「寓所。」</p>
+<p>「城西，水關邊上，順昌客店。」</p>
+<p>唐把這幾個字寫上，擱筆，抬頭看了韓敬一眼：「寓所要真的。局裏傳人，傳你不到，是你的事。」</p>
+<p>「是真的。住的就是這家。」</p>
+<p>「同住的是？」</p>
+<p>「同房的周進，一同登記。」</p>
+<p>唐便又在下面添了一行小字。簿子最後一格是日期，他留著空，筆桿在那一格上點了點：「這一欄不填。局期要等上頭合數，早晚不由人，到時候另有牌子掛出來，你自己來看。」</p>
+<p>「是。」</p>
+<p>「我只依局例，」唐說，「例上寫的，我照辦。」</p>
+<p>他把案上那兩半封紙拿起來，夾進簿子這一頁，一合，放到一邊，轉身把冊與備換頁六疊在一起，放進身後一只上了鎖的木櫃。鎖舌合上，他把鑰匙塞回腰間。空箱與竹篋他沒有留，叫挑夫抬了出去，說：「箱與篋是你們的，自己帶回。」木櫃的門在他背後關緊，韓敬看著那一排櫃子，每一格都貼著府名，他那一格也貼上了，墨還沒乾。</p>
+<p>「明日辰時，過來。」唐說，「下一位。」</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>出了棚屋，周進長長吐了口氣，像是屏了半日。他們在廊外尋了個陰處，靠著柱腳坐下，水囊裏的水已經溫了，喝下去只覺得潤了潤喉。</p>
+<p>隔了幾個窗，許老吏站在一處窗前，正把那只油布長匣的麻繩一道一道解開。窗內的吏伸手接過，揭開，一本一本地點。許老吏兩手空了，仍保持著抱匣的姿勢，彎在身前，一時沒有放下。等窗內說了句什麼，他才把手垂下去，朝那吏拱了拱，轉身，慢慢地從人群裏走出來，走出了廊口。</p>
+<p>韓敬低下頭，把水囊的塞子塞好。</p>
+<p>「韓兄，」周進說，「那位唐大哥，好像不兇。」</p>
+<p>「他是照例辦事。」</p>
+<p>邵吏也交完了冊，搖著汗巾走過來，在他們旁邊蹲下，從懷裏摸出半塊餅，掰開，分了一半給周進。「我住城東，離這兒遠，所以早起。你們在城西？近，好。」他嚼著餅，眼睛看著廊外來來往往的人，「這附近有個茶棚，晌午以後各府的人都往那裏坐，什麼閒話都有。我沒事就去坐坐，聽兩句，不花什麼錢。」</p>
+<p>「聽什麼？」周進問。</p>
+<p>「聽哪個窗今日收得快，哪個窗今日退得多。」邵吏笑，「別的不聽，也聽不懂。」</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>知府的居處在城南，借的是一座寺院的偏院。韓敬在日頭偏西時過去，周進留在客店，看著另一只竹篋。他自己拎著那只放呈報單的竹篋，一路走來，街邊的店鋪漸漸稀了，牆頭探出的樹把影子鋪在路上，比局前涼快些。到了山門，他在門口報了府名，有小沙彌領路，繞過大殿，穿過一道月洞門，院子不大，青磚縫裏長著細草，種著兩株老槐，樹蔭底下擱了一張矮案。</p>
+<p>高謙坐在案後，穿著一件家常的青布袍，沒戴冠，頭髮用一根木簪束著，看上去比在平川時蒼老些，大約是路上受了暑。同知袁站在他側邊，兩手攏在袖裏，靠著槐樹，沒有坐。另有一個人坐在案的另一頭，聽見腳步抬起頭，是杜。</p>
+<p>他們在鄉里同住一條巷子，韓敬認得他三十年，認得他走路微微外八，認得他笑時先眨眼。他比韓敬年長幾歲，這回戴了頂新帽，下頜蓄著短須，是在平川沒見過的。</p>
+<p>「是阿敬，」杜站起來，說的是鄉音，「路上辛苦。」</p>
+<p>「大使。」韓敬躬身。</p>
+<p>杜看了他一眼。那一眼不長，也不重，同巷子裏兩個人在門口碰見的時候差不多。然後他坐回去。</p>
+<p>「冊到了？」高謙問。</p>
+<p>「到了。今日已點收。冊與備換頁六，局裏暫存，封紙是局吏當面割開的。」</p>
+<p>「周進呢？」</p>
+<p>「留在店裏。路上他把各縣鄉數對了一遍，手穩，沒有出錯。」</p>
+<p>「嗯。」高謙點頭，沒有再問。</p>
+<p>「同知的押，認了？」</p>
+<p>袁在樹下動了動：「箱縫我寫的日子。」</p>
+<p>「認了。」韓敬對袁說，「局吏看了日子與押字，才割的。」</p>
+<p>袁點了點頭，沒有再說。</p>
+<p>高謙把手指在案上敲了兩下，朝他伸手：「宗卷呢？局裏點了？」</p>
+<p>「點了件數，不核數。竹篋我帶來了。」</p>
+<p>「拿出來。」</p>
+<p>韓敬把竹篋放在案邊，掀蓋。他從篋中取出呈報單，用細繩紮著，雙手遞過去。高謙接過，解開繩，抽出單子，順手展開，目光在紙上走了一遍。</p>
+<p>韓敬站著。院子裏的槐花落了幾瓣，掉在案角。他的手垂在身側，掌心濕了，便在袍襟上蹭了一下。</p>
+<p>「宗卷，」高謙說，「無誤否？」</p>
+<p>「無誤。」</p>
+<p>話說得比問還快，高謙的最後一個字還沒落地，他已經答完了。高謙抬起頭，點了點頭，又低下頭，把單子折回原樣，用繩紮好，放回竹篋裏。</p>
+<p>「好。」高謙說，「你一路辛苦。」</p>
+<p>韓敬把篋蓋扣上，扣環扣了兩回才扣緊。</p>
+<p>「局裏的事，」高謙把茶盞端起來，這回喝了，「官不進局，局上不見官。你是持冊吏，填數你在場，局吏問什麼，你答什麼。有事來寺裏找我，有什麼要稟的，也到寺裏來。我與同知、大使，都在這裏。」</p>
+<p>「是。」</p>
+<p>袁在樹下終於開了口：「寺裏齋飯有限，你若是不得空，自己在外頭吃，不必來。」說完又攏了攏袖子，往槐蔭裏退了半步。</p>
+<p>韓敬告退。出了月洞門，繞過大殿，山門外的石獅旁，有賣涼水的小販在吆喝。他在石獅邊站了一會兒，才想起手裏還提著竹篋，提把被汗浸得滑了。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>回客店，已點了燈。周進坐在窗下，面前擱著兩碗麵，一碗吃了一半，另一碗蓋著碟子，等他。</p>
+<p>「掌櫃說，後巷的井水乾淨，我打了半桶，放在牆角。」</p>
+<p>「好。」</p>
+<p>掌櫃的夥計送了一壺熱水上來，擱在門邊的凳上，說井水涼，夜裏不要多喝。</p>
+<p>挑夫把空箱抬上樓，放回兩張板鋪中間，韓敬給了錢，挑夫下樓去了。</p>
+<p>他把竹篋放到板鋪底下，同另一只並排，推進去，又拉出來一寸，再推回去。脫了外袍，坐下，揭開碟子，麵已經不熱了。他吃了幾口，周進就在對面看著，很安靜。窗外有蚊蟲撲燈，在燈罩上撞出細細的聲音，周進伸手把燈挪遠了些。</p>
+<p>「韓兄，明日填數，我去不去？」</p>
+<p>「你隨我去。」韓敬說，「站在窗外，看著，不要說話。」</p>
+<p>「是。」</p>
+<p>吃完麵，周進把兩只碗疊了，端下樓去還。腳步聲在樓梯上一階一階地遠了。韓敬一個人留在房裏，聽見後巷有人在收衣裳，竹竿碰著牆，響了兩下。</p>
+<p>他站起來，走到窗邊，推開一道縫。城裏的夜比平川亮，遠處不知哪一家有燈火，一排一排的，照得屋脊的輪廓分明。更鼓響了第一遍。他把窗合上，把熱水倒了半碗，洗了洗臉，水裏有一股鐵壺的味道，吹了燈，躺到板鋪上，聽著周進的腳步聲重新走上來。</p>
+                </div>
+            </article>
+            <article id="ch04" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 4 章</span>
+                        <span class="badge-date">4,391 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第四章：部駁</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>辰時未到，廊下已經站滿了人。</p>
+<p>韓敬帶著周進趕到的時候，昨日那一格木櫃還鎖著，唐坐在窗內，正用一方布揩他那兩根染墨的手指，一根一根地揩，揩完看了看布，又折起來收進袖裏。他抬眼見了韓敬，點一點頭，從腰間摘下鑰匙。</p>
+<p>兩只竹篋是挑夫一早抬來的，放在窗側的小門邊。韓敬自己提進去一只，在案旁一張矮案前坐下，把宗卷一束一束取出來，按縣擺開。矮案很低，膝蓋頂著案沿，坐下去，腰便彎著。</p>
+<p>唐從櫃裏取出冊，雙手捧著，擱在矮案上，又把細布包著的筆硯推過來——是局裏備的，一方舊硯，邊角磕缺了一塊。韓敬搖頭，從懷裏掏出自己那支筆。</p>
+<p>「墨呢？」</p>
+<p>「叫周進磨。」</p>
+<p>唐沒有說話，只朝窗外看了看。周進就站在窗下，兩手背在身後，像是被人點了名，往前走了半步，把一個小布包遞進來，布包裏是他自己的一小錠墨，一只巴掌大的小硯，一截竹筒盛的清水。唐接過來，沒有看，順手遞給韓敬。</p>
+<p>「淡些。」唐說，「昨日同你說過。」</p>
+<p>「記得。」</p>
+<p>韓敬把硯放在矮案的右手邊，隔著窗對周進說：「磨。」</p>
+<p>周進便在窗外，把小硯擱在窗臺上，那窗臺本是各府吏遞文書用的，窄窄一條，他的兩個手肘剛好架得住。他倒了幾滴水，執著墨錠，不急不慢地研。墨錠在硯面上轉，沙沙的，同廊下別的聲音混在一處，聽不出來。磨到一定的時候，他把硯端起來，對著日光瞧一瞧顏色，又添幾滴水，再磨。磨好了，兩手捧著，從窗洞裏遞進去，遞得極穩，硯裏的墨水平平的，沒有晃出半滴。</p>
+<p>唐接了硯，對著光看墨色，說：「好。」把硯交給韓敬。</p>
+<p>韓敬翻開冊，找到第一縣的第一頁。冊頁的紙在櫃裏擱了一夜，帶著一點潮氣，翻起來軟軟的，頁角微微卷著。他用鎮紙壓平，又把墨試了一筆，在廢紙上畫一道，淡淡的，顏色正好。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>崇溪縣。夏稅，秋糧，雜課，驛傳。每一項下是鄉，每一鄉下有戶、有田、有該徵的數。這些數目他在平川府看過兩遍，在府裏周進替他對過一遍，每一個都在束頭的小簽上、宗卷的頁角上、他自己腦子裏某處放著，拿起筆時，卻還是要一個一個去宗卷裏找。</p>
+<p>他取出崇溪縣那一束，用細繩解了，攤在左手邊，按鄉的次序看。看一個數，記一個數，筆尖蘸墨，落到冊頁的格裏，一筆一畫寫下來。每個數寫完，用指頭按一按紙面，等墨吃進去，再往下一格。一頁填滿，他不急著翻，等那一頁的墨全乾，才揭過去，免得前頁的字印在後頁上。一頁一頁，隔著薄紙，能聽見紙與紙分開時輕輕的一聲。</p>
+<p>數字欄原是空的，印是壓在頁縫上的，他寫的每一個字都要避開縫印，不能壓上，不能洇，不能跨格。字小，筆畫要直。</p>
+<p>日頭從廊檐移到棚屋的頂上，棚裏漸漸悶了，板壁被曬得發燙，貼上去能覺出熱氣，墨味、汗味與舊紙的潮味，一層一層地浮起來。別府的聲音從隔板那一邊傳過來：一個吏在同窗內的人爭一個數，兩邊都壓低了嗓子，只聽見「宗卷上是這樣寫的」「局裏要依冊」之類，說了半日，沒有結果，後來聲音停了，只剩下紙頁翻動。另一邊有人在咳，一聲一聲。再過去，有人把一疊紙在案上磕齊，磕了幾下。</p>
+<p>周進在窗外一直站著。每隔一陣，硯裏的墨被筆蘸得淺了，韓敬不必開口，周進已經把硯端起來，說：「韓兄，墨要換了。」他便把硯遞出去，周進倒掉舊的，重磨一份新的，遞進來，墨色同上一份一般淡，分不出差別。墨裏有一點清苦的氣味，不嗆，只是淡淡地浮在鼻端，混在棚裏的熱氣中。</p>
+<p>崇溪縣填完，已近午，棚頂上的蟬叫得更響，震得人耳根發緊。唐起身去喝水，回來把崇溪那一頁捻起來看，每一頁對著宗卷簽核，只看縫、看行、看格，不看別的。看完，放回去，說：「接著。」</p>
+<p>韓敬握了握右手，手指已經僵了。他把筆在硯邊颳乾，換了一口氣，翻過下一縣。</p>
+<p>第二縣的雜課項下，條目比崇溪細碎：魚課、茶課、酒醋課，每一樣各有一個小數，零零碎碎，有的只有幾十文，在宗卷裏散在不同的頁上，要翻來覆去地找。他找到一個，填一個，每填完一項，便在宗卷的那一行旁邊用指甲劃一道淺痕，免得回頭再找時看花了眼。驛傳一項更繁，夫馬、船隻、供應，每個驛一行，他填下去，直填到眼睛裏有了一層澀澀的光。</p>
+<p>他寫字時不說話，周進在窗外也不說話。偶爾隔板那邊有人笑，或是有人把算盤撥得噼啪響，又靜下去。</p>
+<p>午間，周進從懷裏摸出兩塊餅，一塊自己咬著，一塊從窗洞裏遞進來。韓敬接了，沒有吃，擱在矮案邊上。餅被日頭曬得有點暖，油從餅皮裏微微滲出，在紙包上洇了一小圈。他一手翻宗卷，一手寫字，餅一直擱在那裏，到了申時還沒有動。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>懷陽縣是第三縣。</p>
+<p>夏稅，他填過，戶數與畝數一項項對下來，沒有出入；秋糧，是最大的一項。項下先是石數，再是田畝數，田畝一欄，宗卷上寫的是一萬二千零四十畝，他看了一眼，提筆，寫。寫的時候窗外有人過，影子從冊面上掠過去。他沒有抬頭，一筆一筆寫完，用指頭按了按，往下一欄。</p>
+<p>後面的縣一個一個填過去。每填完一縣，韓敬便把那一束宗卷捆好，放回竹篋，再取下一束，扣環輕輕一響。手酸得厲害，膝蓋早已麻了，換了兩回坐姿，仍是不得勁。窗外周進仍站著，換腳的次數比早晨少了，大概是站慣了。日影斜了，從棚屋的板縫裏漏進來幾條細光，落在冊頁上，亮亮的。</p>
+<p>最後一頁是府的總計。</p>
+<p>這一頁很大，格也寬，分兩欄並排：一欄「縣解合計」，一欄「府倉收數」。縣解的數，是每縣解到府的總和，他在船上算過三遍，這幾日又核過一遍，筆在手裏，這個數是熟的：三萬一千二百四十。他寫下來，一筆一筆，每一個字都落得穩，寫完，用指頭按一按。</p>
+<p>下一欄是府倉收數。</p>
+<p>他把宗卷裏府倉的呈報單抽出來，攤在矮案上。這個單子，他看過太多回，上面的數目他不用再看，閉著眼也寫得出來。他把筆蘸了墨，懸在格上。</p>
+<p>筆尖上的墨慢慢聚成一滴，將落未落。</p>
+<p>他沒有落筆。</p>
+<p>窗外的周進不知什麼時候已經停了磨墨，兩手扶在窗臺上，看著他。隔板那邊有人又翻起了紙，聲音很近。墨滴終於墜下去，沒有落在冊上，落在矮案的邊緣，滲開一小團黑。他拿袖子去擦，擦不掉，只擦出一道淡淡的痕。</p>
+<p>「怎麼不下筆？」</p>
+<p>唐不知何時已站在他身後，兩手攏在袖裏，聲音不高。</p>
+<p>「對數。」韓敬說。</p>
+<p>「呈報單在你手上，你看著寫便是。」</p>
+<p>「是。」</p>
+<p>他把筆在硯上舔了一下，重新蘸墨，這次沒有懸，直接落下去。三、萬、一、千、零、零、三，石。他一個字一個字地寫，寫到「三」字最後一筆，筆鋒收乾淨，提起來。</p>
+<p>兩欄並排：三萬一千二百四十，三萬一千零零三。</p>
+<p>他放下筆。周進在窗外，低下頭，去磨那已經磨好的墨。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>唐先看的不是總計頁，是從頭，一頁一頁。他把冊攤在案上，右手持一根細竹籤，左手按著宗卷，對一縣，核一縣，竹籤尖在冊頁的數字上一點，又移到宗卷的頁角上一點，嘴唇不動，只有眼睛在動。廊下的人聲漸漸稀了，棚裏的光從白變黃，唐核得很久，韓敬站在一旁，聽竹籤點在紙上的聲音，一下，一下。</p>
+<p>崇溪過了。第二縣過了。</p>
+<p>到懷陽縣秋糧那一頁，竹籤停下。</p>
+<p>「這裏，」唐說，把宗卷往他那邊推了推，「你看。」</p>
+<p>韓敬湊過去。冊頁上寫的是一萬二千四百畝。宗卷上是一萬二千零四十畝。</p>
+<p>位數錯了。零四十，成了四百。他看著那兩行字，才看出差在哪一筆上：他把「零」省了，把「四」提前了一位，筆順下來順手，字形也像，所以連他自己寫完按那一下的時候，都沒有覺出來。</p>
+<p>「是我寫錯了。」</p>
+<p>「我知道是你寫的。」唐說，「冊面上的字，除了你沒有別人。」</p>
+<p>他沒有再說，把那一頁用竹籤輕輕敲了兩下，繼續往下核。</p>
+<p>總計頁他核得很慢。竹籤停在「縣解合計」，再移到宗卷，一欄一欄地對。他停在「府倉收數」，用手指按了按，把呈報單拿起來，對著光看，看完了，放下，又看了韓敬一眼，轉身，向身後小几上取了一小張紙，裁得方方正正，寸許大小，提起筆，蘸墨，寫字。寫得不快，每一畫都收乾淨，同昨日寫局簿一樣。</p>
+<p>寫完，他把紙遞過來。</p>
+<p>「駁單。兩項，你自己看。」</p>
+<p>紙上是兩行字。</p>
+<p>一：懷陽縣秋糧項下田畝數，冊數與宗卷不符。</p>
+<p>二：府倉收數，與縣解合計不合，差二百三十七石。須倉耗憑證或倉底簿。</p>
+<p>韓敬看完，看了兩遍，疊好，收進袖裏。</p>
+<p>「第一項，改。」唐說，「第二項，局裏不能收，要憑證。」</p>
+<p>「憑證是——」</p>
+<p>「倉耗憑證，或者倉裏的底簿，都行，府裏出。」唐說得平，沒有加重，「除了懷陽那一處，都是照宗卷填的。這個我看得出來。但冊上的兩個數不合，我就收不得。局裏有例，不是我立的。」</p>
+<p>「是。」</p>
+<p>「還有，」唐在他旁邊坐下，把竹籤插回筆筒，「倉解不合的，局裏要報主事。主事看過，要持冊吏到前堂答話，時辰由局裏定，定了有人叫你。你不要走遠。」</p>
+<p>韓敬點了點頭，沒有說話。</p>
+<p>唐又說：「改的頁，要在局裏按府序收頁的那一輪交上來。每日按府序，輪到哪一府，哪一府就交，過了時辰，局裏不候，你要等下一輪。」</p>
+<p>「下一輪是——」</p>
+<p>「那要看合數。」唐說，「局期不由人。」</p>
+<p>他起身，去櫃裏取出備換頁來。六頁用細布包著，放在案上，他數了數，說：「懷陽縣秋糧田畝那一頁，冊頁已填，不能刮，不能改，只能換。你取一頁，重填。」</p>
+<p>「只這一頁？」</p>
+<p>「只這一頁。誰經手，誰署名。」唐說，「改的那一行旁邊署一行。冊末是你攢造的名，已經有了；這回是改的，你再署一行，『經手』，同冊末不是一欄。」</p>
+<p>韓敬取了一頁，攤在矮案上。這一頁同冊頁一樣大，一樣的格，一樣的印，數字欄是空的，印在縫上，是曹貴在平川府印房蓋的。</p>
+<p>他取筆，讓周進再換一份墨。周進換得比平日更小心，倒水時屏著氣，墨遞進來，他一行一行地照著宗卷，重新寫這一頁。懷陽縣的鄉，一個個，戶、田、數。寫到秋糧田畝，他看著宗卷，一筆一筆，把「一萬二千零四十畝」寫下來，寫完，核了兩遍，才往下。重填的頁上，每一鄉的戶數、田畝，他都要再抄一遍，抄到後來，手腕上那根筋一跳一跳地疼。</p>
+<p>這一頁寫得很慢，比前面任何一頁都慢，每寫一個數，指頭都先按在宗卷上那個數的下面，再落筆。唐坐在他旁邊，沒有說話，也沒有催，只在他翻頁時伸手替他按住宗卷的角，免得捲起來。外面的人聲已經很稀了，偶爾有腳步經過窗前，不停，往廊口去。</p>
+<p>寫完，他在秋糧田畝那一行旁，空白的地方，提筆寫：</p>
+<p>「經手　韓敬」</p>
+<p>四個字。他的字，每一豎都往下拖一點，同冊末那一行一模一樣。他寫完，擱筆。</p>
+<p>唐接過去，看了，又對宗卷看了一遍秋糧的數，點了點頭，把那一頁拿在手裏，沒有放回冊裏。</p>
+<p>「原頁不撤，」他說，「撤換是收冊時的事，一併辦。這一頁我暫收，你這一頁用了備換頁一頁，我記上。」</p>
+<p>他翻開局簿，找到平川府那一行，提筆，在「備換」一格寫下：用一。寫完，把那一頁備換頁夾進簿子裏，又把剩下的五頁細布包好，收進櫃，一道放進冊的旁邊。</p>
+<p>「剩五頁。」他說，「冊在櫃裏。」</p>
+<p>鎖舌合上的時候，日頭已經把廊下的影子拖得很長。唐把簿子也鎖進抽屜。韓敬站起來，兩腿麻了，扶著矮案站了一會兒，才站直。腿裏像有細針在走，一陣一陣，他低頭看自己的手，指肚上染了一片淡淡的墨色，擦不掉。周進在窗外，把小硯裏剩下的墨水倒掉，把硯揩乾，用布包好，問了一句：「韓兄，好了？」聲音有些啞，是一日少開口的緣故。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>出了局門，周進把餅還給他：「韓兄，這個你沒有吃。」</p>
+<p>「你吃吧。」</p>
+<p>「我吃過了。」</p>
+<p>韓敬把那塊餅接過來，放進袖裏，同駁單放在一處。他們沿著廊走，到了廊口，他說：「你先回店，把竹篋抬回去，我去寺裏。」</p>
+<p>「我跟你去？」</p>
+<p>「不用。」</p>
+<p>周進看了他一眼，把竹篋提起來，一隻手一只，肩膀歪向一邊，走了。韓敬看著他的背，直到轉過街角，才轉身往城南走。</p>
+<p>傍晚的街比白日安靜些，攤販在收攤，把未賣完的菜蔬往筐裏攏，賣涼水的小販敲著銅盞，一聲長，一聲短。他走得不快，腳底還留著坐久了的麻，右手還在發酸，筆握久了，指頭伸不直，只好在袖裏攏著。經過一座橋，橋下的水映著天邊一線紅，有一條小船正撐出橋洞，船頭坐著一個老人，在補一張網。他站在橋上，看那船遠了，船尾的水紋一圈一圈散開，慢慢平了，才又往前走。石欄被一日的日頭曬過，到這時還微微有些暖。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>寺院裏的鐘剛敲過一遍，暮色從山門外漫進來，簷下的燕子一隻接一隻掠進巢裏，院子裏有人在掃地，掃帚沙沙地掃過青磚，揚起一陣塵。高謙在槐樹下的矮案前坐著，樹影已經黑成一團，案上點了一盞燈，面前擺著一碗粥，已經涼了，沒有動。</p>
+<p>同知袁不在。廊下只有一個小沙彌，蹲在廊下，用瓦片刮一隻舊缽的底。</p>
+<p>「回來了。」高謙說，「今日填數？」</p>
+<p>「填完了。」</p>
+<p>「駁了什麼？」</p>
+<p>韓敬站在案前，兩隻手攏在袖裏。袖裏有那張駁單，紙邊有些軟，是被汗浸的；有一塊餅，餅硬了。他用右手的指甲，在袖子裏沿著駁單的摺痕，一下一下地掐，掐出一條更深的印。</p>
+<p>「駁了一處筆誤。」他說，「懷陽縣秋糧項下的田畝數，我寫錯了，位數。已改了，換了備換頁一頁，局裏暫收。」</p>
+<p>「備換頁？」</p>
+<p>「備換頁用了一頁，還剩五頁。」</p>
+<p>「嗯。」高謙拿起粥碗，看了看，又放下，「筆誤在你，不在府裏，局裏怎麼說？」</p>
+<p>「局裏說，經手的人署名，我署了。」</p>
+<p>「署在哪裏？」</p>
+<p>「秋糧田畝那一行旁邊。」</p>
+<p>高謙點了點頭，沒有再問。他伸手把燈撥亮了一點，燈花落進油裏，嗤地響了一聲。</p>
+<p>「這種事年年有，」他說，「不必放在心上。冊收了，你就可以回去。」</p>
+<p>「是。」</p>
+<p>「還有別的嗎？」</p>
+<p>韓敬沒有立刻答。院子裏掃地的人停了手，掃帚靠在牆上。那個小沙彌刮完了缽，把缽翻過來，用袖子擦。</p>
+<p>「倉上有幾項，」他說，「想請教大使。」</p>
+<p>高謙抬起頭看他，只一瞬，目光很平，同平日看戶房呈上來的文書沒有兩樣。</p>
+<p>「問去。」</p>
+<p>他說完，端起那碗涼粥，喝了一口。</p>
+<p>韓敬躬身退出來。月洞門那邊，偏院的東側有一間小屋，門掩著，門縫裏透出一線燈光。他站在石階下看了一會兒，鞋底踩著一粒小石子，他沒有挪開。</p>
+                </div>
+            </article>
+            <article id="ch05" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 5 章</span>
+                        <span class="badge-date">5,204 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第五章：倉耗</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>石階一共三級，韓敬在最下一級又站了站，鞋底那粒小石子硌著腳心，他把腳挪開了，上去。</p>
+<p>韓敬叩門，叩得很輕，兩下，停一停，再一下。這是小時候在巷子裏叩杜家後門的叩法，叩出來了他才覺出來。</p>
+<p>門裏有凳腳挪動的聲音。門開了一道縫，杜的臉在燈影裏，新帽摘了，額頭上壓著一圈帽痕。</p>
+<p>「阿敬。」杜說的是鄉音，把門拉開些，「我當是小沙彌來換水。進來，帶上門。」</p>
+<p>屋子很小，一張板床靠牆，行李攤在床上，繩子還沒解。桌上一盞油燈，兩只茶盞，一把粗陶壺。窗紙破了一角，用糨糊補過，補得歪。牆角靠著一根不知誰留下的扁擔，扁擔頭上掛著一縷蛛網，被燈火一烘，微微地動。杜在桌邊坐下，指指對面的凳子，韓敬坐了，凳腳不平，坐上去身子往一邊斜。</p>
+<p>「吃過了沒有？」杜問。他從床頭的包袱裏摸出一個冷饅頭，看了看，又放回去，「寺裏的齋飯，過了酉時就沒有了。我是自己帶了乾糧的。」</p>
+<p>「吃過了。」</p>
+<p>杜倒茶，壺嘴磕在盞沿上，叮的一聲。院牆外頭有蟲在叫，叫著，停的時候，聽得見遠處城裏的更鼓。「今日局上怎樣？」</p>
+<p>「駁了兩項。一項是我筆誤，換了頁。」韓敬把手從袖裏抽出來，擱在膝上，「另一項，府倉收數和縣解合計不合，差二百三十七石。局裏要倉耗憑證，或者倉底簿。」</p>
+<p>杜沒有立刻答。他端起自己那盞茶，不喝，兩手捧著，拇指在盞沿上來回擦。</p>
+<p>「多少？」</p>
+<p>「二百三十七。」</p>
+<p>「二百三十七。」杜念了一遍，像念一個生人的名字，「你算了幾遍？」</p>
+<p>「三遍。」</p>
+<p>「你怎麼算出來的？」</p>
+<p>「宗卷裏縣解一縣一縣加，同呈報單上的收數對。在船上。」</p>
+<p>「戶房的人，」杜說，「就是閒不住。」他笑了一下，笑得很短，「別人在船上看水。」</p>
+<p>杜點了點頭。燈花爆了一下，他看著那團火，燈芯的影子在他臉上一跳一跳。他才說：「我曉得是少的。」</p>
+<p>「過斛的時候我就站在斛邊上。縣裏報解多少，船到了，倒進斛裏是多少，眼睛看得出來，每年都少些。米倒進斛裏，斛口用木板刮平，管斛的喊一聲數，書手記一筆。喊的是多少，記的就是多少。」杜把茶盞放下，「斛外頭的事，我看不見。少多少，我沒有算過。」</p>
+<p>「為什麼不算？」</p>
+<p>「算了就要記。」杜看著他，不躲，「倉簿上只記收進來的。過了斛是多少，記多少，單子上報的就是多少，三萬一千零零三，一粒不假。你要我記一筆少收，倉簿上沒有這一欄。要報，就是我報上去，報上去，短的是我賠。」</p>
+<p>「賠？」</p>
+<p>「倉大使自己賠。知府不管這個。」杜說得很平，像說一樁鄉里的規矩，「不報，歷來沒有人查。往年也少，差個十幾二十石，我自己找補，倉裏補平了，單子上報的就是平的。今年差得多，我補不起，單子上報的就是實收。」</p>
+<p>「底簿呢？」</p>
+<p>「沒有。」杜說，「倉簿就是底簿。你到哪個倉去要折耗的底簿，都是這一句。」</p>
+<p>韓敬低頭看自己的膝。膝上那兩隻手，指肚上還留著昨日的淡墨。</p>
+<p>「局裏說，這一項不過，整部冊都不收。」他說，「冊不收，我回不去，知府也回不去。」</p>
+<p>「整部冊？」</p>
+<p>「局期有如星火，這一輪不收，要等下一輪，下一輪看合數。」</p>
+<p>杜把茶盞轉了半圈。</p>
+<p>「憑證，」韓敬又說，「大使能不能出一張？」</p>
+<p>杜的拇指停在盞沿上。</p>
+<p>「憑證。」他重複，「寫一張，白紙黑字，說倉中少收二百三十七石。我寫了，就是我自己認了倉裏少收。」他把兩手攏起來，放進袖裏，「我賠不起。賣了那三間屋也不夠。二百三十七石，阿敬，一粒米沒進我家。」</p>
+<p>「我知道。」</p>
+<p>「你知道。」杜說，「局上不知道，知府也不知道。」</p>
+<p>屋外有人走過，腳步在石徑上去遠了。</p>
+<p>「知府那邊，」杜問，「你說了沒有？」</p>
+<p>「沒有。」</p>
+<p>杜的肩落下來，像是原先一直端著什麼。他從袖裏抽出手，提起壺，往韓敬的盞裏添茶，添得太滿，茶溢到桌上，他拿袖口去抹，抹了兩下。</p>
+<p>「局上要數，」他說，「我給你一個數。你問我，我答：就當折耗二百三十七石，填上去。」</p>
+<p>「口說的數，局裏肯收？」</p>
+<p>「我口裏的數是我的，收不收是局裏的。」杜說，「折耗是真折耗，我沒有拿。你要的是一個數，我給你這個數，二百三十七。」</p>
+<p>「這是我算出來的差。」</p>
+<p>「差是你算的，折耗就是這個差。」杜抬眼，「我若自己算，也只能算出這個。」</p>
+<p>韓敬看著桌上那一灘水，水順著桌面的木紋慢慢淌開，流到桌邊，一滴一滴落在地上，落在兩人之間。誰也沒有去擦。</p>
+<p>「還有一樁，」杜說，「別往倉上追底簿。倉上沒有，你派人去問，問到我手下管斛的、管庫的，人人都曉得我少了二百三十七。那就不是我說不說的事了。」</p>
+<p>「倉裏沒有，我就不問倉裏。」</p>
+<p>杜點了一下頭，把另一盞茶也推到他面前，推了半截，又收回去。</p>
+<p>杜沒有再說這件事。他把壺提起來，看盞是滿的，又放下，問：「老太太的咳，好些沒有？」</p>
+<p>「入夏好些。」</p>
+<p>「你家那隻花雞，」杜說，「小時候飛過牆，在我家柴堆裏下蛋。我娘拾了，煮了，煮好又端回你家去，說是你家的蛋。你娘不收，說是下在我家柴堆裏的，就是我家的。兩個人在牆根推了一早上。」</p>
+<p>「記得。」</p>
+<p>「我娘後來把那隻蛋吃了。」杜笑，先眨了眨眼，「說是推累了，不吃白不吃。」</p>
+<p>韓敬起身告辭。杜送到門口，手扶著門框，沒有說別的話，只說了一句：「夜裏黑，過月洞門看著腳。」</p>
+<p>院子裏黑著，槐樹下那盞燈早滅了。韓敬走過月洞門。</p>
+<p>回到客店，周進已經睡下，臉朝著牆。韓敬沒有點燈，摸黑在板鋪邊坐下，把袖裏的駁單取出來，攤在膝上。看不見字，他用手順著紙上的摺痕摸過去，摸到第二行的地方，停了停，又摺好，放回袖裏。他在板鋪上躺著，聽著更鼓響到第二遍。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>早飯是掌櫃端上來的稀粥，一碟鹹菜。周進喝粥時把碗捧得很高，眼睛看著碗沿，喝完把碗底舔了一圈，才放下。韓敬看見了，沒有說他。他自己只喝了半碗，剩下的推給周進，周進接了，也沒有推讓。</p>
+<p>出門時周進把墨錠、小硯、細筆一樣一樣放進布包，放得很慢，放完又打開來看了一遍。</p>
+<p>初五的隊比初四更長。辰時未過，廊下已經排到廊外的土路上，後面的人不斷往前擠，把前面的人推到窗根底下。</p>
+<p>韓敬沒有排。他先到唐的窗前，平川那一格木櫃還鎖著，櫃門上的籤子墨跡已經乾透，才退到窗側站著。窗側的牆根下，各府的吏蹲著、靠著，有人在啃餅，有人拿帽子蓋著臉打盹，有人把文引攤在膝上，看了一遍又一遍。周進在他身後，手裏提著那只小布包。今早周進一進局門，就在窗臺上把小硯擺開，倒了水，慢慢磨了一份墨，磨好了，用一張紙蓋在硯上，立在旁邊，什麼也沒有問。</p>
+<p>棚裏的板壁一過辰時便開始發燙，隔板上有人拿刀尖刻了一道一道的印子，是數日子的。唐在窗內，手裏的筆沒有停過。他額上有汗，順著鬢角流下來，他拿那方布擦了，擦完折起來，又接著寫。窗前的人一個換一個，他一個一個點、核、駁、收，嘴裏只有數目與府名。有一個吏遞上去的冊角折了，他只用指頭在那個角上敲了敲，那吏便抱著冊退出去，蹲在一邊，用手掌一點一點捋平。</p>
+<p>等他手邊空了半息，韓敬往前走了一步。</p>
+<p>「唐吏。」</p>
+<p>「說。」</p>
+<p>「倉上沒有底簿。大使口說折耗二百三十七石，頁上能不能寫？」</p>
+<p>唐的筆在紙上走著。「頁上寫什麼，是你的事。」他說，「憑證欄要憑證。口說的，不算。」</p>
+<p>「憑證欄空著，這一頁收不收？」</p>
+<p>「收不收，不是我一個人說的。」唐這才抬眼，「傳你的話還沒有下來。」</p>
+<p>「這一頁不收，別的頁呢？」</p>
+<p>「別的頁收了，這一部冊也不算收齊。」唐說，「不齊，這一府就擱著，等下一輪。下一輪看合數，我說過。」</p>
+<p>「備換頁能不能先給我，頁先寫好？」</p>
+<p>「頁子輪到你府才發。」唐說，「先寫了，不收。」</p>
+<p>後面的人用文引敲了敲窗臺，敲得不重，一下一下。唐把眼睛移開，說：「下一位。」</p>
+<p>韓敬退回窗側。周進把紙揭開，看墨，又蓋上，抬眼看他，又低下去，把那張紙捺了捺。</p>
+<p>「韓兄，」他壓低了聲，「今日要寫什麼？」</p>
+<p>「還不知道。」</p>
+<p>周進「哦」了一聲。他從布包裏摸出一塊餅，掰了一半遞過來。韓敬接了，在手裏握著，餅漸漸涼了，他才咬了一口。</p>
+<p>巳時過了，午時過了。隔板那邊一個吏同窗裏的人爭了起來，被另一個人拉走了。窗前有個吏被退了冊，抱著匣子走到牆根，背靠牆蹲下去，把臉埋進兩臂裏。沒有人去看他。日頭挪到廊頂正中，棚裏的熱氣把人烤得發蔫，周進把水囊遞給他，水是早上灌的，已經不涼，他喝了一口，遞回去。周進接過，沒有喝，把塞子塞緊。他兩次想往前站，兩次看見唐的窗前還排著人，又退回來。</p>
+<p>未時，輪到平川府。</p>
+<p>唐把筆擱下，站起來，從腰間摘下鑰匙，轉身去開木櫃。鎖舌一響，門才開了一半，窗側的小門那邊有人喊：「平川府持冊吏。」</p>
+<p>來的是個小吏，穿著半舊的短衫，手裏什麼也沒拿，站在小門口，沒有進來。</p>
+<p>「前堂。主事叫，即刻。」</p>
+<p>韓敬看他。他又說了一遍，一個字沒有變。</p>
+<p>唐捧著冊，站在櫃前。「輪到你府了。」他說，「你若走開，這一輪過去，等下一輪，看合數。」</p>
+<p>窗外的人聲忽然全進了耳朵：後面的吏在咳，有人用腳碾著地，有人低聲說「怎麼還不動」。小吏站在門口，腳尖朝外。</p>
+<p>韓敬把手伸進袖裏，摸到駁單，又放開了。</p>
+<p>「倉數頁，合計頁，」他對唐說，「各換一頁。我被傳，同房的周進寫。局簿上有他。」</p>
+<p>唐看了窗外的周進。「進來。」</p>
+<p>周進從小門裏進來。他把布包往腋下一夾，在衣襟上把手擦了擦，才拿起那支細筆，筆尖是乾的，蘸了窗臺上端進來的那一硯墨。唐把冊翻開，找到府倉那一頁，攤在案上。那一頁韓敬昨日也填過，一行是一項，每項後面是石數，最右邊一欄窄窄的，格頭只有一個字，是「憑」，每一行的那一欄裏，都注著「倉簿」二字。唐又找到總計頁，並排放了，另從細布包裏抽出兩頁備換頁，擱在原頁旁邊。印在縫上，數字欄空著。</p>
+<p>唐沒有問為什麼，也沒有看韓敬。他只是把案上的鎮紙推開了一寸，給周進讓出地方。</p>
+<p>「倉數頁，」韓敬說，「照原頁抄，府倉各項收數，一行不動。末一行底下添一行：折耗，二百三十七石。憑欄各行照抄『倉簿』，折耗那一行，空著。」</p>
+<p>周進的筆已經蘸了墨，開始寫。</p>
+<p>「合計頁，縣解合計，三萬一千二百四十。府倉收數，三萬一千零零三。底下添折耗，二百三十七。再下一行，合計，三萬一千二百四十。」</p>
+<p>「合計，三萬一千二百四十。」周進輕聲重複，筆沒有停。</p>
+<p>小吏在門口咳了一聲。唐的竹籤在案上點了點。</p>
+<p>周進寫到倉數頁的最後一行，筆尖頓了頓，抬起頭。</p>
+<p>「署我的名？」</p>
+<p>韓敬看他。他的臉很白，嘴唇卻是紅的，筆懸在紙上，墨沒有滴。</p>
+<p>「你寫的就是你經手。」韓敬說，「數有錯你要答。」</p>
+<p>周進看了他一眼。過了一息，他說：「是。」</p>
+<p>他低下頭，在折耗那一行旁邊，一筆一畫寫下四個字：</p>
+<p>「經手　周進」</p>
+<p>寫完，他把筆提起來，吹了吹。字很乾淨，每一豎都收得直。</p>
+<p>「走。」小吏說。</p>
+<p>韓敬轉身。他聽見身後筆尖落在紙上，沙沙的，是第二頁。他沒有回頭。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>前堂在棚屋後面，隔一道屏門，穿過去是一間敞廳，青磚地，四根大柱，柱腳被人靠得發亮。廳裏擺著三條長凳，坐著兩個吏，各抱著一只匣子，不說話。廳外的蟬聲隔著屏門傳過來，變得很遠，像是別處的事。廳裏比棚屋涼，有一股潮磚與舊墨混在一起的氣味，磚地吸著腳底的熱，韓敬站了站，才覺出自己的衫子後背早已濕透，貼在身上。小吏把韓敬領到凳邊，指了指，轉身出去了。臨走低聲說了一句：「叫到就站著答。」</p>
+<p>他在凳邊站著，沒有坐。凳上的兩個吏，其中一個把匣蓋掀開一道縫，看了看，又合上。等了不到一盞茶的工夫，裏面的人出來，是個白臉的吏，匣子抱在胸前，經過韓敬身邊時沒有看他。小吏又進來，朝韓敬點了一下頭。</p>
+<p>廳盡頭是一張高案，案後有一架屏風，屏風上什麼也沒有畫，只是一幅素絹。案後坐著主事。四十出頭，瘦，穿著官袍，領口有些皺，案上堆著幾本簿，他沒有翻。他的左手按著一只茶盞，沒有喝。</p>
+<p>「平川府？」</p>
+<p>「是。」</p>
+<p>「倉解不合，二百三十七石。」主事說，眼睛看著案上，「為何？」</p>
+<p>「折耗。」韓敬說，「府倉沒有底簿。」</p>
+<p>主事點了一下頭。他端起茶盞，這回喝了一口，放下，盞底碰在案上，輕輕一響。</p>
+<p>「折耗，哪一府沒有。入冊，署名齊備，局裏就收。」他把茶盞挪開半寸，「署的人答這個數。下一府。」</p>
+<p>「是。」</p>
+<p>主事已經轉過臉，朝門口抬了抬下巴。韓敬躬身退出。他走出廳門時，身後傳來下一個人報府名的聲音，是個陌生的府，念得很含糊。出了屏門，他走得很快，過廊口時差點撞著一個抱匣的吏，側身讓過去，也沒有停。廊下的日頭白花花的，他進棚前，抬手把額上的汗抹掉，手心也是濕的，在袍襟上蹭了一下。</p>
+<p>回到窗前，棚裏比他走時更熱。窗外的人還排著，唐已坐回案後，手邊擱著兩頁新寫的紙，並排攤著，邊角各壓了一枚鎮紙。周進退到了窗外，站在窗臺邊，右手三根指頭染黑了，直染到第二個指節，正拿水往硯裏添。</p>
+<p>「回來了。」唐說。「主事怎麼說？」</p>
+<p>韓敬壓低了聲：「折耗，哪一府沒有。入冊，署名齊備，局裏就收。」</p>
+<p>唐聽了。</p>
+<p>窗外有人在催，催了兩聲。唐沒有理，把竹籤尖在布上揩了揩，才拿起來，不快，一頁一頁看。倉數頁，一行一行對原頁，對到最後，折耗一行，二百三十七石；旁邊，「經手　周進」。他停了一下，竹籤移到右邊。憑欄上別行都注著「倉簿」，這一行的右邊，空著。</p>
+<p>他看了那空處一眼，又看那四個字。字寫得齊整，一筆也沒有歪。</p>
+<p>然後他取過第二頁。總計頁，兩欄並排，底下添了兩行：折耗，二百三十七；合計，三萬一千二百四十。合計那一行旁邊，又是一行：「經手　周進」。墨色同第一頁一般淡，頁角那一塊墨還沒有全乾，有些發亮。</p>
+<p>窗外那個催的人把文引遞到窗臺上，遞得很近，文引的邊角碰到了案沿。唐拿起這兩頁，對著棚頂漏下來的光看了一遍。</p>
+<p>「收。」他說。</p>
+<p>他翻開局簿，找到平川那一行。那一格裏昨日寫的「用一」還在，他把筆尖停在旁邊，劃去，改寫，一筆是一筆，寫完，念了出來：「用三。」又在後面添了兩個小字，「待換」。他把兩頁夾進簿子，同昨日那一頁夾在一處，再把剩下的備換頁拿起來，用細布包好，連同攤著的冊，一併放回櫃裏，鎖了。</p>
+<p>「剩三頁。」</p>
+<p>「是。」</p>
+<p>唐把簿子收進抽屜，鎖了，從窗洞裏看向下一個人。他沒有問駁單，也沒有說要不要銷。駁單在韓敬袖裏，紙邊被汗浸軟了，他伸手摸到，沒有取出來。</p>
+<p>「下一位。」唐說。</p>
+<p>周進在窗外把筆在硯邊颳乾，包進布包。後面的吏已經擠到了窗前，有人的肩膀撞了他一下，他把布包抱緊了些，往旁邊讓了讓。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>出了局門，日頭已經偏西，廊下的影子拖得老長，一直拖到土路上。兩人都沒有說話。周進走在前面，走得比平日快，到了路口，又停下，站在一家賣漿的攤前等韓敬走過來。他的手垂在身側。</p>
+<p>他們沿著廊外的牆走。牆根下蹲著幾個沒有輪上的吏，抬頭看他們，又低下頭去。隔了半條街，周進開口：</p>
+<p>「韓兄，那個數，是從哪裏來的？」</p>
+<p>「杜大使說的。」韓敬說，「倉裏沒有底簿。」</p>
+<p>周進沒有說話。賣漿的人在背後吆喝，一聲高，一聲低。走過一座石橋，橋下水淺，露出幾塊泥灘，有個孩子蹲在那裏，用樹枝撥水。周進看著那孩子，看了一陣，說：</p>
+<p>「唐大哥收了。」</p>
+<p>他的聲音很輕，卻聽得出有一點亮，像是說完怕被人聽見似的，又低下去。他把手收進袖裏，走了兩步，又抽出來。</p>
+<p>韓敬沒有回他。</p>
+<p>「韓兄，餓不餓？」周進忽然問。</p>
+<p>「不餓。」</p>
+<p>「我也不餓。」周進說，過一陣又說，「前頭有賣燒餅的，我昨日看見了。」</p>
+<p>他們各買了一個，站在店檐下吃。餅是剛出爐的，燙手，周進左右手倒著拿，吃得很快。韓敬咬了一口，嚼了很久才嚥下。</p>
+<p>過了橋，路寬了些，兩邊是賣竹器的店，竹簍竹籃一排一排掛在檐下，被風吹得輕輕相碰。周進落後半步，跟著他走。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>夜裏，客店。</p>
+<p>掌櫃送上來一盞油燈和一壺水，說後巷的井今日水渾，要沉一沉。周進洗了手，把盆端下樓去，回來躺下，把被角拉到胸口，眼睛睜著看橫梁。</p>
+<p>「韓兄，明日還去局上？」</p>
+<p>「等唐吏的話。」</p>
+<p>「哦。」周進說，過了一會兒，「那明日我還磨墨。」</p>
+<p>「睡吧。」</p>
+<p>韓敬在窗下坐著，把小簿從懷裏摸出來。藍布面，邊角比路上更白了。他翻到最後有字的那一行，是六月初六，在下面另起一行，蘸了蘸筆。</p>
+<p>七月初四，杜云折耗二百三十七，無簿，無憑。</p>
+<p>寫完，吹了吹，下一行：</p>
+<p>七月初五，口述數，進書倉頁、總頁，署經手。</p>
+<p>再下一行：</p>
+<p>進云：署我的名？進云：是。</p>
+<p>他看了一遍，字不大，同藥帳的寫法一樣，一行一行。他把簿子闔上，擱在膝上，坐了一會兒。</p>
+<p>窗外有人收竹竿，竿頭碰著牆，響了兩聲。巷子盡頭有狗叫，叫了幾聲就停了。燈裏的油淺下去一截，燈花結得很大，沒有人去剔。</p>
+<p>周進的呼吸慢慢勻了。他的右手擱在被外，三根指頭仍是黑的。韓敬看了一眼，把簿子放進貼身的布袋，同文引壓在一處，走到桌邊，吹了燈。</p>
+                </div>
+            </article>
+            <article id="ch06" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 6 章</span>
+                        <span class="badge-date">5,021 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第六章：收冊</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>局前的牌子一直沒有動靜，韓敬每日辰時還是到局。</p>
+<p>唐的窗前照舊排著人。韓敬走到窗邊站定，唐抬眼看他，說：「等牌子。」他便退到窗側，在牆根下找一處有陰的地方蹲下。周進跟在後頭，把小布包擱在膝上，墨錠、小硯、細筆一樣一樣擺出來，倒了水，慢慢磨了一份墨，磨好了，沒有東西可寫。他拿紙蓋了硯，坐著看別人進進出出，看完一撥，又看一撥。</p>
+<p>頭幾日天晴得發白，後來悶下來，有一個午後落了雨，雨點打在棚頂上，劈劈啪啪，窗前排著的人都往廊下擠，擠得肩挨著肩。雨過去，土路上泛起一股潮味，廊柱上的水順著往下淌，淌到柱腳，積成一小窪。</p>
+<p>棚裏的人說的總是那一句：等牌子。唐每日辰時開窗，每日酉時落窗，中間的事，窗外的人都看得見：點、核、駁、收，一個換一個。韓敬看久了，竟能從窗前人的背影，看出哪一個是被退了冊的。</p>
+<p>茶棚在局廊口外，三根柱子撐一張蘆席，席下擺幾張矮桌，賣的是粗茶，一文一碗。晌午以後，各府的吏都往那裏坐。邵吏占著最外頭的一張，見他們過來，把身邊的凳子挪出一截。</p>
+<p>「又是等？」</p>
+<p>「是。」</p>
+<p>「我也是。」邵吏把汗巾往肩上一搭，「臨水府的冊還在東頭窗裏擱著，昨日聽說那邊的人換了班，換上來的更慢。」</p>
+<p>他說的都是這些：哪個窗今日退了誰的冊，哪一府的吏乾糧吃完了，在棚後買兩個燒餅，貴了一文。他說他住城東，過了大橋，賣醋的鋪子後頭，一戶人家騰出半間屋給他，房東老婆子早晚煮粥，比別處的稠。只是來回要走一個時辰，他便索性在茶棚坐到日頭偏西才動身。周進捧著茶碗，一口一口喝，喝得很慢。碗是粗瓷的，沿上缺了一小塊，他把缺口轉到另一邊去，才又喝。他看見茶棚外頭有個孩子在賣炒豆，眼睛跟著那個孩子轉，又低下頭去。</p>
+<p>韓敬坐在凳子的邊上，兩手搭著膝，聽邵吏說話，也不大答。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>牌子掛出來的那一早，天是薄薄的陰。</p>
+<p>局前的土路上圍了一圈人。廊柱上釘了一塊木牌，白底，墨字，一行一行是府名，頂上一行寫了四個，下頭兩個大字：收冊。平川排在第三個。</p>
+<p>有人在念，念得很響，念到哪一府，哪一府的人便從人堆裏擠出去，往窗前走。邵吏也在人堆裏，伸著脖子從頭看到尾，回過頭來對韓敬笑了笑：「平川。有你的。我還沒有。」</p>
+<p>「韓兄，」周進壓低了聲音，「是咱們。」</p>
+<p>「進去。」</p>
+<p>唐在窗內，已經把東西擺好了。冊放在案正中，下面墊著油紙。案左攤著局簿，簿邊夾著幾張紙，疊得方正，上頭壓一枚鎮紙。</p>
+<p>「文引。」</p>
+<p>韓敬雙手遞上。唐展開，從頭看到尾，嘴唇輕輕動了動，遞還。周進站在窗外，兩手垂著，把小布包貼在腰側。</p>
+<p>「當著你的面辦。」唐說。</p>
+<p>他把冊立起來，書脊朝外，用那把薄刃的小刀，在線結上一挑。線一圈一圈鬆下來，他一圈一圈抽出來，盤在案角。冊頁散開了，只靠手按著。他先翻到懷陽縣秋糧，指尖在頁邊一點：「這一頁。」抽出來，擱在案左。頁上一萬二千四百畝，是韓敬自己的字。</p>
+<p>又翻到府倉項下，抽出一頁。那一頁最右有窄窄的一欄，格頭是「憑」，每一行都注著「倉簿」二字，最末一項底下是空白。再翻到最後，抽出總計頁，兩欄並排：三萬一千二百四十，三萬一千零零三。</p>
+<p>三頁疊在案左，摞得整齊。</p>
+<p>唐從局簿裏取出夾著的那三張，一張一張，放到原先的位置上。懷陽的那一頁，秋糧田畝那一行的旁邊，是「經手　韓敬」。倉數頁，最末添了一行折耗，二百三十七石，旁邊「經手　周進」，折耗那一行的右邊，憑欄空著。總計頁，折耗，合計，旁邊又是「經手　周進」。墨已經全乾，不亮了。</p>
+<p>他把每一頁的邊同上下兩頁對齊，拿手掌按一按，對著棚頂漏下來的光，看縫上的印。備換頁預蓋的印，邊上留的是半個圓，同兩邊的頁一湊，圓便合上了，印文接得上。看了三處，每處看過，說一句：「縫對上了。」</p>
+<p>然後他拿起細竹籤，在新換的總計頁上點。三萬一千零零三，加折耗二百三十七，三萬一千二百四十。他點完了，竹籤放下。</p>
+<p>穿線的針是一根粗針，線是新線，白的。他一針一針穿過去，針腳走得很勻，收了結，咬斷線頭，把冊合上，用手掌按平，推到案中。</p>
+<p>「原頁，」他說，「局裏存根。」</p>
+<p>他取過一張皮紙，把案左的那三張疊起來，懷陽在上，倉數在中，總計在下，對折，再對折，四邊折進去，成一個方包。拿筆在包面上寫「平川府　原頁三」，下頭寫了日子，畫押。他起身，轉過去，開了靠牆另一只櫃子。櫃門上的籤子只有一個字，存。櫃裏已經有不少紙包，一個挨一個，各寫著府名。他把那個包放進去，放在最外一排，關上櫃門，把鑰匙塞回腰間。</p>
+<p>回到案前，他從木櫃裏取出細布包著的備換頁，攤開，擱在案上。</p>
+<p>「一，二，三。」</p>
+<p>他數得清楚，一頁一頁翻過去，每翻一頁，讓韓敬看一眼縫上的印。三頁數完，疊齊，裝進一只小匣。匣是柏木的，巴掌厚，蓋子扣得嚴。他取一條長紙，從匣蓋貼到匣身，封了口，在封紙上寫了平川府、備換頁三，寫了日子，畫押。</p>
+<p>局簿翻開，平川那一行，「備換」一格寫著「用三」，後面「待換」兩個小字。他拿筆把「待換」劃去，另寫，一邊寫一邊念出聲：</p>
+<p>「收用三，封存三。」</p>
+<p>寫完，他把小匣擱在木櫃裏，同冊放在一處，鎖了。</p>
+<p>案上只剩一張小紙。他提筆，蘸墨，寫得不快，每一畫都收乾淨。寫畢，從抽屜裏取出局印，對著印面呵了一口氣，端端正正按下去。印泥是朱紅，邊緣有一點洇。他遞過來。</p>
+<p>紙上寫的是：</p>
+<p>「平川府持冊吏韓敬，繳錢穀冊書一部，收訖。寓所順昌客店。」</p>
+<p>底下一行是日子，落款是唐的名，蓋著局印。</p>
+<p>韓敬從頭看到末，看了兩遍。他把紙折了兩折，收進貼身的布袋，同文引壓在一處。</p>
+<p>「駁單帶回，」唐說，「交你府。」</p>
+<p>「是。」</p>
+<p>「局裏的事了了。」唐說得很平，同往常念府名一樣，他合上局簿，抬頭往窗外，「下一位。」</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>出了局門，日頭偏著，廊下的影子短短的。周進走在旁邊，手裏提著小布包，走了一程，開口問：</p>
+<p>「韓兄，是不是可以回去了？」</p>
+<p>「要知府批。」</p>
+<p>「哦。」周進說。他把布包換到另一隻手，過一會兒又問：「那批，什麼時候下來？」</p>
+<p>「今晚我去問。」</p>
+<p>過橋，路邊有一家藥鋪，門口掛著一串曬乾的藥草，鋪面窄，櫃臺後頭站著一個夥計，正拿小銅秤稱東西。韓敬站在櫃前，報了方子：當歸，黃耆，白朮。「一帖。」</p>
+<p>夥計把紙鋪在櫃上，拿秤，一味一味稱，稱好了倒在紙上，三堆，各是各的顏色。他把紙四角折起，用麻繩紮了，在上頭壓一張紅箋，雙手遞過來。韓敬付了錢，一文一文數，數過一遍，又數了一遍，才把錢放在櫃上。藥包不大，他放進袖裏，貼著臂彎。</p>
+<p>周進看著那個藥包，說：「老太太的藥，這下夠了。」</p>
+<p>「還差得遠。」韓敬說。</p>
+<p>走了幾步，他又說：「這一帖是這個月的。」</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>傍晚他往城南去。</p>
+<p>山門外頭，賣涼水的小販已經收了攤，石獅子的影子拖在石階上。小沙彌在山門裏頭掃地，掃帚一下一下，把落葉攏在牆根。見了他，小沙彌把掃帚靠在腿邊：「老爺在院裏。大使同知老爺在後頭屋裏，用過飯了。」</p>
+<p>韓敬點了點頭，繞過大殿，穿過月洞門。</p>
+<p>槐樹底下，矮案還在老地方，案上點了一盞燈，高謙坐在後面，家常的青布袍，木簪。面前一盞茶。</p>
+<p>「冊收了，」韓敬說，「帖在我這裏。」</p>
+<p>他站在案前三步遠的地方，兩腳踩在一道磚縫的兩邊。</p>
+<p>「好。」</p>
+<p>高謙點了點頭。燈花結得大了，他拿起剪子，剪去一截，剪得很短，放回案上。</p>
+<p>「回程的批，」他說，「明日你來取。把文引帶來，帖也帶來。」</p>
+<p>「是。」</p>
+<p>「辛苦了。」高謙說，「回去歇著吧。」</p>
+<p>韓敬退了半步。他的腳尖原本頂著那道磚縫，這時退到縫後頭，鞋底在青磚上蹭了一下。院子裏有人在關門，吱呀一聲。他躬身，退出去。</p>
+<p>小沙彌提著一盞燈，送他到山門口。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>夜裏客店。周進已經睡下，這回臉朝外，呼吸很勻。韓敬在窗下坐著，把小簿摸出來，翻到最後有字的地方，在下面另起一行：</p>
+<p>七月十二，收冊，帖一。</p>
+<p>只有這一行。他闔上簿子，放進布袋，藥包從袖裏取出，擱到枕邊。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>第二日一早，掌櫃的灶沒有生火，說是灶膛裂了，要等匠人來修，粥是沒有的。周進餓著，卻不吭聲，把布包繫好，站在門邊。</p>
+<p>「去局前吃個燒餅。」韓敬說。</p>
+<p>茶棚裏已有人坐著。邵吏在最外頭那張矮桌，面前一碗茶，沒有動，一隻手按著桌沿，看見他們，招了招。</p>
+<p>「收了？」</p>
+<p>「收了。」</p>
+<p>「好，好。」邵吏把凳子往旁邊讓，等他們坐下，又往左右看了看，聲音低下來，「你們聽說沒有？」</p>
+<p>韓敬看著他。</p>
+<p>「我也是昨日傍晚在這裏聽人說的。安平府——不是江西的——那邊的知府，昨日叫人帶走了。冊也叫御史臺調去看了。」</p>
+<p>「為什麼？」</p>
+<p>「說是印的事。」邵吏說，「我就聽到這麼多。」</p>
+<p>鄰桌背對著他們坐的一個吏說：「空印。是空印的事。」</p>
+<p>邵吏把頭偏過去：「你怎麼曉得？」</p>
+<p>「我也是聽人說的。」</p>
+<p>「我不曉得是不是那個。」邵吏轉回來，拿汗巾擦了把脖子，嘴邊兩道深紋抽了抽，「年年不都是這麼辦的嗎？哪一府的冊不是先蓋了印再來。」</p>
+<p>「還有人說，」鄰桌那個吏又開口了，仍舊沒回頭，「要派御史去代他們。」</p>
+<p>「那是傳話的人說的。」邵吏說，「我不信這些。」</p>
+<p>周進端著碗，水在碗裏晃了一下，他把碗放下，兩手放到膝上。</p>
+<p>「安平府的冊，」韓敬說，「收了沒有？」</p>
+<p>「這我就不曉得了。」邵吏說，「我也問過，沒有人說得準。」</p>
+<p>賣燒餅的就在茶棚後頭，一爐子火，熱氣撲出來。韓敬買了四個，付了錢，把兩個遞給周進，自己拿著兩個，沒有吃，也沒有放下。邵吏還在說什麼，說安平府在哪個省，離京多遠，他說得斷斷續續，說完自己也笑了：「我連它在哪兒都不清楚。」</p>
+<p>韓敬把燒餅用紙包了，收進袖裏，同藥包放在一邊。</p>
+<p>出了茶棚，走到廊口，他停下。</p>
+<p>「你回店裏，」他對周進說，「在店裏等，哪裏也別去。」</p>
+<p>「韓兄你去哪裏？」</p>
+<p>「寺裏。取批。」</p>
+<p>「高大人若有話，」周進說，「會派人來的。」</p>
+<p>「不能等。」韓敬說，「帖要當面交，批要當面取。」</p>
+<p>周進看著他。他把小布包抱在胸前，點了點頭：「我在店裏。」</p>
+<p>韓敬往南走，走到街角，回頭看了一眼。周進還站在廊口，站在原地，像是在等他走遠，才肯動。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>山門口，挑夫正把一擔行李往肩上放，兩只竹箱，用麻繩穿了，在扁擔兩頭晃。挑夫蹲著，起身時膝蓋咯地響了一聲。</p>
+<p>「這是平川府的行李？」韓敬問。</p>
+<p>「是不是平川，我不曉得。」挑夫肩上一沉，把擔子顛正，「送到城東大橋頭，有人等著。」</p>
+<p>他下了石階，走得很快。韓敬跟出去幾步，叫了一聲，挑夫沒有回頭，鑽進街上的人堆裏，扁擔頭一晃，不見了。</p>
+<p>他轉身進山門。小沙彌正蹲在牆根，拿一根樹枝撥螞蟻。</p>
+<p>「老爺呢？」</p>
+<p>「走了。」小沙彌抬頭，「三位官人，天沒亮就走了。」</p>
+<p>「往哪裏去？」</p>
+<p>「城東。挑夫說的。」</p>
+<p>「幾時說的？」</p>
+<p>「昨夜就說好了，今早天不亮來的。」小沙彌把樹枝扔了，在衣襟上擦手，「昨夜有位官人來尋老爺，坐了很久。今早他們就走了。」</p>
+<p>「誰？」</p>
+<p>「不認得，沒說名字。」</p>
+<p>韓敬往裏走，穿過月洞門。院子打掃過了，槐樹底下的矮案還在，案面抹得乾乾淨淨，沒有燈，也沒有盞。正屋的門開著，床板光了，地上沒有一片紙。東側那間小屋，門也開著，窗紙的角上有一塊歪歪的糨糊補丁，牆角靠著一根扁擔，扁擔頭上掛著一縷蛛網，在穿堂風裏微微地動。</p>
+<p>他站在院子當中，四面看了一遍。簷下的燕巢還在，燕子不知到哪裏去了，巢口落下幾根細草。</p>
+<p>「老爺有話留給我嗎？」</p>
+<p>「沒有。」小沙彌跟出來，站在月洞門邊。</p>
+<p>「說過搬去哪家？」</p>
+<p>「沒有說。」</p>
+<p>韓敬把袖子拉了拉，轉身走出山門。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>城東他是頭一回來。大橋是一座石橋，橋頭有一排賣吃食的攤子，橋那邊便是官宅，一條巷接一條巷，兩面高牆，牆頭探出槐樹與棗樹的枝葉。門樓不大，門口多半掛著一塊牌，寫的是某府某縣，或者什麼也沒有。</p>
+<p>他在橋頭站著，看不見那副擔子。</p>
+<p>他從第一條巷子走起。敲門，門房從門縫裏探出半張臉：「找誰？」</p>
+<p>「平川府知府，高大人。」</p>
+<p>「不認得。」門關了。</p>
+<p>第二家，門房說：「我家老爺不見客。」第三家是個老僕，聽完，抬手往巷子底下指了指：「這條巷裏住的，都是在京候差的外官，各住各的，我們不曉得別家。」</p>
+<p>他一條巷一條巷地問下去，叩三下，停一停，報一遍府名。日頭從頭頂移到西邊，牆影一寸一寸爬上對面的牆，腳後跟起了泡。有一家門口站著兩個穿青布袍的人，背影很像，他快步走上去，喊了一聲「高大人」，那人回過頭來，是個陌生的臉，四十出頭，皺著眉看他。他退後兩步，作了個揖：「認錯了。」</p>
+<p>天色暗下來，街上亮起零星的燈。更鼓響了第一遍，巷子盡頭，兩個提燈籠的人迎面走來，把他攔住，一個手裏敲著梆。</p>
+<p>「這個時辰，街上不許走動。」</p>
+<p>「我住城西，」韓敬說，「有事。」</p>
+<p>「城西？」那人把燈籠舉高，照他的臉，「城西太遠，你走不到。回去，哪裏來哪裏去。」</p>
+<p>「我不是這邊的人，沒有地方——」</p>
+<p>「那是你的事。」另一個人說。</p>
+<p>他站在巷口，鼓聲已經遠了，遠處不知哪家的狗吠了兩聲。</p>
+<p>他想起邵吏。大橋，賣醋的鋪子，後頭一戶人家。</p>
+<p>他往回走，走過大橋，橋下的水黑黑的，映著一兩點燈。賣醋的鋪子還沒有關門，一股酸味撲出來，他繞到鋪子後頭，那裏有一道矮牆，牆裏有一間屋，窗裏透出燈光。他叩門，叩了三下。</p>
+<p>開門的是個老婦人，瞇著眼看他：「找誰？」</p>
+<p>「邵吏，臨水府的。」</p>
+<p>「在裏頭。」老婦人把身子讓開，「吃粥呢。」</p>
+<p>邵吏坐在桌邊，面前一碗粥，兩根鹹菜。看見他，筷子停在半空：「韓兄？」</p>
+<p>「借一宿。」韓敬說，「有人不見，今夜走不回去了。」</p>
+<p>邵吏沒有多問，把粥碗往桌邊推了推，對老婦人說了句什麼，老婦人轉身出去，端來半碗稠粥，擱在桌上。韓敬吃了，粥是燙的，他吃得很快，吃完才覺出自己一天沒有吃過東西。燒餅還在袖裏，已經涼透，他沒有拿出來。</p>
+<p>地方是屋角的一塊鋪，鋪下是乾草，上頭一張薄席。邵吏把自己的被子分了一半給他。</p>
+<p>「那孩子呢？」邵吏問，「一個人在店裏？」</p>
+<p>「我吩咐了，」韓敬說，「他不會動。」</p>
+<p>邵吏哼了一聲，滅了燈。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>第二日他起得早。邵吏還在睡，嘴微微張著，鼾聲很輕。他把薄席捲好，放回屋角，輕輕開了門。院子裏老婦人已經在燒水，見了他，說：「粥在鍋裏。」</p>
+<p>他喝了半碗，邵吏披著衣裳出來，揉著眼睛：「這麼早。」</p>
+<p>「我去找人。」</p>
+<p>「你住哪一家？」邵吏問。</p>
+<p>「城西水關邊上，順昌客店。」</p>
+<p>「我今日下了值繞過去，同那孩子說一聲。」</p>
+<p>韓敬看著他。</p>
+<p>「不必，」他說，「我今日就回。」</p>
+<p>他出了門，往西走到路口。路口有一棵老柳，柳下有個賣水的挑子，往西的那條路伸出去，一眼望不到頭。他站了一下，又折回巷子裏。</p>
+<p>昨日問過的幾家，今日換了人當班，問了仍是那幾句話。他換了問法，不說知府，說同年，說隨行的同知與大使，說平川府。有一家的門房聽到平川，搖了搖頭：「不曉得。」門閂落下去，咚的一聲。午間他在橋頭的攤子上喝了一碗涼水，攤主說這幾日往橋那邊去的外官多，哪一府的都有，記不住。</p>
+<p>午後，有一家官署的值房開著門，他進去，值房裏的吏聽了，搖頭：「在京候差的外官，各住各的，署裏不管。」又補了一句：「你要找，去問平川府自己的同鄉。」</p>
+<p>他的同鄉，在這個京城，只有杜，也不見了。</p>
+<p>天又暗了。他站在橋頭，手伸進袖裏，摸到藥包，摸到燒餅，摸到那一張駁單，紙邊已經軟得不成樣子。更鼓響了第一遍，兩個提燈籠的人從巷口走出來，看見他，其中一個說：「又是你。」</p>
+<p>他轉身，往賣醋的鋪子走。街上的人少了，賣吃食的攤子都罩了布，只有橋頭一盞燈籠還亮著，燈罩上落著幾隻小蟲。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>邵吏已經吃過了，坐在屋角補一只布鞋，針在鞋底上一進一出。看見他進來，只指了指桌上的粥：「涼了，熱過再吃。」</p>
+<p>韓敬沒有熱。他坐在鋪沿上，把一碗涼粥喝完，碗擱在地上。</p>
+<p>邵吏補完鞋，把針別在衣襟上，吹了燈。</p>
+<p>屋裏黑下來。窗紙外頭有一點月光，淡淡的，落在地上一小塊。邵吏躺下去不一會兒，鼾聲便起來了，一聲長，一聲短，中間停一停，又接上。窗外的月光慢慢挪過那一小塊地，挪到邵吏的鞋邊上。</p>
+<p>韓敬躺在乾草上，兩眼睜著。袖子還沒有脫，藥包被壓扁了，貼在臂彎裏，隔著藥紙，能摸到三味藥各自的顆粒。懷裏那張帖，他沒有取出來。</p>
+<p>天一亮，先回城西，看周進，再往寺裏去一趟。</p>
+                </div>
+            </article>
+            <article id="ch07" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 7 章</span>
+                        <span class="badge-date">4,662 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第七章：署名</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>天剛亮，水關邊上的霧還沒有散，韓敬走進巷口的時候，鞋面已經濕了。</p>
+<p>巷口圍著人。賣水的挑子擱在牆根，扁擔橫在地上，挑夫自己也擠在人堆裏，伸著脖子。有一個老婆子提著一只木盆，忘了往河邊去。後頭的人踮腳，前頭的人側著身子，把肩膀讓出一條縫，讓晚到的人也看得見。</p>
+<p>牆上貼著一張榜。紙是白的，糨糊刷得厚，四角還沒有乾，微微翹起。字是粗筆寫的，一行一行，墨很黑。</p>
+<p>韓敬站到人堆後面，從別人的肩縫裏看過去。</p>
+<p>榜頭四個字：御史臺榜。底下寫的是：</p>
+<p>「近查各處有司考校錢穀，冊書預用空印。凡主印吏及署字有名者，俱赴臺聽勘，違者同罪。」</p>
+<p>最後一行是日子。</p>
+<p>前面有個人在小聲念，念得很慢，一個字一個字，念到「聽勘」，舌頭絆了一下，又回頭重念。念完，旁邊的人問：「說的是誰？」</p>
+<p>「送冊的。」另一個說。</p>
+<p>「送冊的在咱們這條巷子裏？」</p>
+<p>「誰知道。」</p>
+<p>賣水的把扁擔從地上撿起來，又放下。霧從河面那邊慢慢退過來，貼著牆根，榜上的字在一點一點亮起來。</p>
+<p>韓敬把榜文從頭看了一遍。人堆往前擠，他被推得退了半步，又站回去，再看一遍。看到「違者」兩個字，他的眼睛停了一下，然後轉身，從人堆邊上走出去。</p>
+<p>客店的門就在巷子裏頭，三十步。門板已經卸下了，門口的地被掃過，濕的，帶著掃帚的紋路。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>掌櫃在櫃臺後頭，面前一本帳，筆擱在硯上，沒有動。他抬起頭，看見是韓敬，把眼睛垂下去，又抬起來。</p>
+<p>「客官回來了。」</p>
+<p>「我那位同住的，」韓敬說，「周進。」</p>
+<p>掌櫃把手從帳本上拿開，在衣襟上擦了擦，繞出櫃臺。大堂裏只有兩張桌子，一張靠窗，一張靠牆，都空著，凳子倒扣在桌面上，還沒有放下來。掌櫃走到韓敬跟前，聲音放低了。</p>
+<p>「昨日，午後。」他說，「來了兩個人。」</p>
+<p>「什麼人？」</p>
+<p>「穿短衫，腰上掛牌子，木的，上頭一個字，臺。」他用手指在櫃臺上劃了一劃，劃的是個「臺」字，劃到一半，停了，「小的不識得是哪一路的臺，只見那牌子。一個站在門口，一個進來，手裏拿一張單子，問店裏住的有沒有平川府的人。」</p>
+<p>「你怎麼說？」</p>
+<p>「小的說有。」掌櫃的喉頭動了動，「簿上寫著兩位，樓上那間。」</p>
+<p>韓敬沒有出聲。</p>
+<p>「那人看著單子念，」掌櫃說，「念了兩個名字。平川府持冊吏韓敬，同住周進。他念得很清楚，一字一字的。問，韓敬在不在。」</p>
+<p>「周進在？」</p>
+<p>「在。他聽見有人叫，自己從樓上下來。是小的領他下來的，他手上還沾著墨。」掌櫃把自己的手舉起來，又放下去，「他說，韓兄去寺裏取批了。」</p>
+<p>韓敬看著他。</p>
+<p>「那人說，那就你先去。」</p>
+<p>「周進問了嗎？」</p>
+<p>「問了。問是什麼事。」</p>
+<p>「差人怎麼答？」</p>
+<p>「說，冊上署了名的，都要去一趟。」</p>
+<p>「他們上樓，」掌櫃接著說，「讓小的帶路。進了屋，指著那兩只竹篋，說這是不是宗卷。周進說是。他們就搬了。一人一只，扛在肩上，下樓。樟木箱沒有動，行李也沒有動。那位小哥自己收拾了一下，」他頓了頓，「就是一個小布包，墨呀硯呀，他說先擱著，又改了口，說還是帶上。差人沒說不許。」</p>
+<p>韓敬的目光移到樓梯上。</p>
+<p>「布包他留下了。」掌櫃說，「出門前又回去，放在鋪上。」</p>
+<p>「差人讓他放？」</p>
+<p>「沒攔。」</p>
+<p>「他們留了話。」</p>
+<p>「留了。」掌櫃把兩手垂下來，轉述得很平，像背一個賬目，「他們說，韓敬回來，自己到臺裏去一趟。」</p>
+<p>「哪個臺？」</p>
+<p>「沒說。」掌櫃說，「就是腰牌上那一個字。」</p>
+<p>韓敬沒有說話。掌櫃看他，看了很久，才又開口，聲音更低：</p>
+<p>「那位小哥，走到門口，又回過頭。小的在櫃臺後頭站著，他叫了小的。他說，掌櫃，勞你帶一句話給韓兄。」</p>
+<p>「什麼話？」</p>
+<p>掌櫃的嘴唇抿了一下。</p>
+<p>「署的字，是我自己寫的。」</p>
+<p>他說完這一句，就不再說了。他轉回櫃臺後頭，拿起筆，蘸了墨，蘸過頭，墨滴在帳本上，他拿袖子去擦，擦出一片灰。</p>
+<p>韓敬站在櫃臺前。大堂的窗紙漸漸白起來，門外有人在說話，說的是榜。灶間裏有人劈柴，劈了兩下，聽見外頭的話，停了，又接著劈。</p>
+<p>「還有嗎？」他問。</p>
+<p>「沒有了。」掌櫃說，「就這句。」</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>門口暗了一下，有人跨進來，帶進一股潮氣。是邵吏。他走得急，額上一層汗，汗巾捏在手裏，鞋面上濺了泥點，褲腳也是濕的。</p>
+<p>「你走得早，」他說，「我收拾了就跟來了。」</p>
+<p>他往大堂裏看了一圈。凳子倒扣在桌上，掌櫃在櫃臺後頭低著頭，一本帳攤著，墨滴暈出一片灰；韓敬站在櫃前，兩手垂著。</p>
+<p>「孩子呢？」</p>
+<p>「被臺裏的人帶走了。」</p>
+<p>邵吏沒有再說什麼。他用汗巾擦了擦脖子，朝門外巷口望著，那邊人聲嗡嗡的，一陣高一陣低。</p>
+<p>「你要去哪？」他問。</p>
+<p>韓敬沒有答。他轉過身，朝樓梯走去。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>樓梯第三級還是那一塊鬆板，踩上去，吱的一聲。</p>
+<p>房門半開著。屋裏比平日亮，窗是開的，後巷裏晾著的衣裳換了一批，滴著水，水珠一顆一顆落在對面的瓦上。</p>
+<p>兩張板鋪，靠裏的是他的，被子疊著，沒有動過。靠外的是周進的，被子也疊著，疊得方正，四角對齊，枕頭擺在被子正中。枕頭邊上，板鋪的外沿，放著一個小布包。</p>
+<p>地上有兩塊方印子，灰比別處淺，是竹篋原先擱的地方。樟木箱還在牆邊，箱蓋是合著的，箱縫上留著一道糨糊印。他走過去，掀開箱蓋。裏面空的，只有樟木的氣味，衝出來，比起初還淡了。他把蓋子放下，手按在上頭，停了一會兒。</p>
+<p>窗外有人在喊。不是喊他，是巷口的人，喊的是同一句，一個人說了，另一個人又說，話聲隔著兩道牆傳進來，聽不清字。巷口有賣糖的吆喝，不是為這個，走過去，也就遠了。</p>
+<p>他走到周進的板鋪前。被面上有一道淺淺的凹痕，是人坐過的。他站了一下，才把小布包拿起來。布是藍的，洗得發白，繫口打的是個死結，周進一向打得很緊。他沒有解，用拇指按了按，裏頭是硬的：一方小硯，巴掌大；一錠墨，磨得只剩半截；幾支細筆，筆桿子上有牙印。有一支的筆尖是乾的，沒有蘸過墨。</p>
+<p>他把布包夾在左臂底下。</p>
+<p>然後他把右手伸進懷裏，從貼身的布袋裏取出文引。紙折成四折，邊緣磨得起了毛。他展開，靠到窗邊，就著光看。</p>
+<p>某府吏韓敬，持錢穀冊書一部、備換頁六、宗卷若干，赴京局繳納，沿途關津驛站驗放。</p>
+<p>底下，小字一行：回程須府批。</p>
+<p>再底下是年月，是府印。印是紅的，邊緣清楚，上頭沒有第二個印，沒有批，沒有字。</p>
+<p>他把那一行看了一遍。又看了一遍。窗外的水珠落在瓦上，一顆，兩顆。</p>
+<p>他把文引照原來的折痕折回去，折成四折，邊角對齊，用手掌壓平。袖子裏的藥包被他的動作擠了一下，他摸出來，放在板鋪上，過了一息，又拿起來，放回袖裏。</p>
+<p>他沒有收拾自己的東西。行李在床下，包袱的結沒有動。他走到窗前，往下看。巷口的人還在，賣水的挑子已經走了，只剩牆根一灘水。更遠處，河上有船撐過去，篙入水，起來，滴著光。他把文引收進布袋，扣好，下樓。</p>
+<p>樓梯的鬆板又響了一聲。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>邵吏還站在大堂門口，背對著他，面朝巷子。聽見腳步，他轉過頭，看見韓敬夾在臂下的布包，眼睛在那上頭停了一下。</p>
+<p>「你要去哪？」他又問了一遍。</p>
+<p>「臺裏。」</p>
+<p>邵吏嘴張了張，沒有再問。他往旁邊讓了半步。掌櫃在櫃臺後頭，筆還拿著，沒有看他們。</p>
+<p>韓敬走出門。巷口的人比先前更多了，後頭的人站在別人的背後，只能看見一張白紙的邊。他從人堆邊上走過去，沒有再停。邵吏在後頭跟了兩步，停在巷子的轉角，沒有再跟。</p>
+<p>他夾著布包，走在人流的邊上。過了水關，沿河往北，一家賣紙燭的鋪子前頭，也貼了一張榜，榜前站了兩個人，在看，沒有說話。他向正在卸門板的伙計問臺在哪裏。伙計朝北一指：「過了前頭那座橋，順著河走到頭，見黑漆大門就是。」又說：「今早問的人不少。」韓敬道了謝，過了橋，沿河走去。</p>
+<p>走了不知多久，日頭已經離了屋脊，到了一處地方，牆很長，門是黑漆的，兩扇門只開了一扇，門前一對石墩，墩邊有幾個人，或坐或站。門額上是三個字，字是舊的，漆色褪了。</p>
+<p>門柱旁邊，貼著同樣的一張榜。榜下頭的地上，扔著幾個踩扁的油紙。墩邊的人各自帶著東西：一個挎著籃子，籃上蓋一塊藍布；一個老漢蹲著，兩手攏在袖裏，下巴抵著膝；還有個年輕後生，把一只舊褡褳抱在懷裏，一直朝門洞裏張。韓敬從他們中間過去，沒有人抬頭。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>門洞裏擺著一張矮桌，桌後坐著一個吏，三十上下，袖口束得很緊，面前攤著一疊單子，一方硯，一支筆。桌子兩邊各站一個持棍的，不說話。</p>
+<p>門外石墩上坐的人，是來送飯的，或來打聽的，沒有一個進門。一個婦人提著食盒，在門洞口站著，向裏頭問了一句什麼，持棍的搖頭，她便把食盒換到另一隻手，退回石墩邊上，坐下，又站起來。韓敬從他們中間過去，走到桌前。</p>
+<p>「哪裏來的？」</p>
+<p>「平川府持冊吏韓敬。」</p>
+<p>門吏抬起頭，看了他一眼，低下去，在單子上翻。翻得不快，一張一張，翻到一張，停住，用筆桿指著。</p>
+<p>「平川府。」他說。</p>
+<p>他念的聲音不高，也不低，念給桌前站的人，也念給桌後記錄的人。</p>
+<p>「高謙，主印。」</p>
+<p>「同知袁，封記畫押。」</p>
+<p>「曹貴，主印吏，本處拘解。」</p>
+<p>「韓敬，攢造署，經手一處。」</p>
+<p>韓敬站在桌前，兩手垂著，布包夾在臂下。桌上的硯裏墨已經結了薄皮。</p>
+<p>「周進，經手二處。」</p>
+<p>門吏的聲音沒有變。</p>
+<p>「高謙、同知袁，昨夜已到。」</p>
+<p>他把單子翻過一折，擱在硯邊。</p>
+<p>「是你？」</p>
+<p>「是。」</p>
+<p>「周進同住？」</p>
+<p>「同住。」</p>
+<p>門吏在簿上寫了幾個字，寫得很快，沒有抬頭。寫完，他擱下筆，把手在桌沿上拍了一下，像是拍掉灰。</p>
+<p>「東西都拿出來。」</p>
+<p>韓敬把布包放到桌角，從懷裏取出貼身的布袋，解開繩，從裏頭取出文引，折成四折，又取出一張小紙，是收冊帖，疊了兩疊，邊上有一點朱紅的洇。他把布袋重新繫上，收回懷裏。又從袖裏摸出那張駁單，紙邊軟得像布，四個角都起了毛。</p>
+<p>門吏先拿文引，展開，看了一遍。看完，把文引放到桌的左手邊。</p>
+<p>然後是帖。他念出聲：「平川府持冊吏韓敬，繳錢穀冊書一部，收訖。寓所順昌客店。」念完，又看了一眼上頭的局印，擱到文引上面。</p>
+<p>駁單是最後。他把紙展平，用兩根手指按著，從頭看下去。</p>
+<p>字是唐的字，工整，寸許的方紙。第一項寫的是懷陽縣的田畝，第二項：</p>
+<p>「府倉收數與縣解合計不合，差二百三十七石，須倉耗憑證或倉底簿。」</p>
+<p>他沒有問。他把駁單折了一折，放在帖的邊上，與那兩樣放在一處。</p>
+<p>「身上。」</p>
+<p>韓敬張開兩臂。門吏的一個手下繞過桌子，從他的肩頭摸起，摸過前襟、腰、腿根，把袖子撩起來看了看，叫他把鞋脫下來，拿在手裏抖了抖，又讓他穿上。他的手粗，指甲縫裏有泥。探到右袖，他停住，拿出來，是一包東西，紅箋，麻繩。</p>
+<p>「什麼？」</p>
+<p>「藥。」</p>
+<p>門吏接過去，拿在手裏掂了掂，湊近聞了一下，放在桌上。</p>
+<p>「藥不許帶進。」</p>
+<p>「是治我母親的。」韓敬說，「長年的方子，當歸、黃耆、白朮。」</p>
+<p>「不許帶。」門吏說，「收了。」</p>
+<p>韓敬看著那個紙包被放到另一個小筐裏，筐裏已經有幾樣東西，一把梳子，一只舊荷包。他沒有再說。</p>
+<p>搜身的人又從右袖裏掏出一個紙包，比藥包扁，打開，是兩個燒餅，早已涼透，硬得邊上裂了口。門吏拿起一個，在桌沿上敲了一下，聲音是悶的。他看了看，也扔進筐裏。</p>
+<p>搜身的人又去摸他的懷，摸到那只貼身的布袋，掏出來，翻過來，抖了抖，抖出一個小冊子，掉在桌上。薄薄的，藍布面，邊角磨白。</p>
+<p>門吏拿起來。</p>
+<p>「這是什麼？」</p>
+<p>「藥帳。」韓敬說。</p>
+<p>門吏翻開。第一頁，是一行一行的小字，每行幾個藥名，藥名後面是數目，數目後面是日子。他一頁一頁往後翻，翻了三頁，四頁，每一頁都是這樣的寫法：當歸三錢，黃耆五錢，白朮四錢，錢數與日子，一排一排，墨色深淺不一。翻頁的聲音沙沙的。</p>
+<p>翻到第五頁，門吏把冊子闔上，沒有再往後。他把它遞過來。</p>
+<p>韓敬接了。冊子被門吏的手捂過，帶著一點溫。他沒有打開，把它放回布袋，繫好。</p>
+<p>「這個，」他說，指著桌角那只藍布小包，「是同住的周進留下的。一點筆墨。轉給他。」</p>
+<p>門吏看了看那個包，又看了看他。</p>
+<p>「人在不在裏頭，」他說，「進去就知道。」</p>
+<p>他伸手，把布包拿過去，擱進筐裏，同藥包放在一處。</p>
+<p>文引、帖、駁單，他用一根麻線穿起來，打了結，放進另一只筐。兩只筐都有蓋，蓋上壓著一方青石，他一手提著一只，交給身後的手下，手下往門洞裏面去了，腳步聲在石板上響了一陣。門洞外頭，日頭已經爬到牆頭，一塊亮影落在石墩上，挎籃子的那個人站起來，把籃子換了一隻手。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>獄在門的後頭，要穿過兩重院子。進第一重，先在側邊一間小屋前停下。屋裏坐著另一個吏，面前一本簿，簿旁一碗涼茶，上頭浮著一隻小蟲。</p>
+<p>「姓名。」</p>
+<p>「韓敬。」</p>
+<p>「府。」</p>
+<p>「平川府。」</p>
+<p>「年歲。」</p>
+<p>「三十五。」</p>
+<p>「籍貫。」</p>
+<p>「本府人。」</p>
+<p>「職事。」</p>
+<p>「府吏，戶房。」</p>
+<p>那吏一邊問，一邊寫，筆走得慢，每個字寫完才問下一項。寫完，他把筆在硯邊颳了颳，朝外喊了一聲。獄吏從院子那頭走過來，手裏提著鑰匙。</p>
+<p>第一重院子鋪的是磚，磚縫裏長著草，有人走過，草是倒的。第二重院子小，三面都是牆，牆根潮，長了一層綠的苔。引他的是個獄吏，六十上下，手裏提一串鑰匙，走一步，鑰匙響一下，聲音很鈍，一串掛得太久的銅鑰匙，互相磨得發啞。</p>
+<p>他沒有說話，韓敬也沒有。</p>
+<p>過道是黑的。從院子走進去，眼睛要停一會兒，才能看出是一條長廊，兩邊是木柵，一間挨一間。廊頂很低，韓敬抬手一探，指尖就碰到了梁。地上是泥，不是乾泥，是半濕的，踩上去粘腳。有一股氣味，說不清，是霉，是尿，是人的汗，混在一處，不衝，只是很厚，吸進去，在喉嚨裏留一層。</p>
+<p>過道上有水聲，滴，滴，不是一處，是幾處，各有各的節拍，不重合。柵欄後頭有人。他走過的時候，沒有人說話，也沒有人把臉貼上來。他只看見一些影子，坐著的、躺著的，有一隻腳露在柵外，腳上的襪是破的。</p>
+<p>「到了。」</p>
+<p>獄吏在一道柵前停下，說了一句「進去，別出聲」，從鑰匙裏挑出一把，插進鎖，轉。鎖舌退下去的時候響了一聲，不大，在這個地方卻聽得很清楚。</p>
+<p>他拉開柵門。韓敬低頭進去。</p>
+<p>柵門在他身後合上。鎖舌彈回。</p>
+<p>鑰匙聲往回走，一步，一步，遠了，過道的另一頭有一道門，開了，又關了。</p>
+<p>屋裏有三個人，各靠著一面牆。一個老的，鬍子花白，閉著眼；一個年輕些，兩手抱著膝，頭埋在膝頭；一個中年的，背靠牆坐著，眼睜著，看了他一眼，又看別處。沒有一個人開口，也沒有一個人問他從哪裏來。地上鋪著乾草，草已經被壓扁，草下是潮的。屋角有一只木桶，桶上蓋一塊板。</p>
+<p>頂上很高處有一個小窗，不過一尺見方，窗外是牆，光從牆縫裏漏下來，落在地上，一小塊，淡得幾乎看不見。</p>
+<p>他在空著的牆邊坐下。草在他身下發出細碎的響。</p>
+<p>有人在另一頭翻身，木板吱呀響。</p>
+<p>他把兩手放在膝上，坐了一會兒。老的那個依舊閉著眼，嘴唇在動，沒有出聲。年輕的那個肩頭抖了一下，又不動了。中年的把一根草莖從草裏抽出來，在指頭上繞，繞緊了，鬆開，又繞。沒有人看他，也沒有人看別人。</p>
+<p>光塊從地上慢慢往牆上爬。</p>
+<p>然後他把右手伸進懷裏，摸到那本小簿的硬角，手指停在上頭。</p>
+                </div>
+            </article>
+            <article id="ch08" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 8 章</span>
+                        <span class="badge-date">5,645 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第八章：查問</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>飯是從柵底下的縫裏遞進來的。一只木盆，盆裏四碗粗米飯，每碗上頭擱一撮鹹菜，鹹菜是黑的，咬下去發苦。獄吏把盆往裏一推，盆底在泥地上拖出一道痕，人就走了。一天兩回，有時隔得近，有時隔得遠，哪一回是早的，哪一回是晚的，全靠小窗底下那塊光。光塊落在地上，是早；爬到牆上，是午；爬到牆角的磚縫裏，不見了，就是晚。</p>
+<p>水是一瓢。一人一瓢，倒在各人自己的碗裏，喝完，碗要還出去。桶一天抬走一回，各屋的人輪著抬，抬出去，倒了，洗也不洗，又抬回來，蓋上板。桶回來的時候，屋裏的人都把臉轉向牆。</p>
+<p>過道上水還在滴。幾處的滴聲各有各的間隔，聽久了，他分得出來：靠近柵口的那一處最快，後頭有一處最慢，慢到他以為它停了，隔很久，又落一滴。遠處那個咳嗽的人還在咳，咳一聲，停很久，再咳一聲。</p>
+<p>夜裏有蚊子，從小窗進來，在耳邊細細地響。沒有人拍，也沒有人趕，天亮的時候，每個人的手背上都是紅點。</p>
+<p>老的那個一直閉著眼，唇動，不出聲。飯來了，他睜開眼，兩手捧碗，吃得很慢，一粒一粒的，吃完了又把碗底舐一遍。年輕的那個夜裏有時哭，哭得很低，臉埋在膝上，肩頭一聳一聳；哭完，過一會兒，睡去了。第二天他吃飯，臉上乾乾的，什麼也看不出來。</p>
+<p>韓敬坐的那面牆，牆皮是潮的，背靠上去，衫子後面一片涼。他把腿屈起來，又伸直，又屈起來。草被壓得越來越薄，薄到後來，膝蓋下面是硬的。有一夜他醒了，發現自己的右手又在懷裏，指頭按著那本小簿的邊角。他把手拿出來，放在草上，草是濕的，他又把手擦乾。</p>
+<p>白天沒有事做的時候，他用指頭在草上劃。劃的是數目，三萬一千二百四十，三萬一千零零三，一筆一筆，草軟，劃不出痕，劃完了，他用掌心把它抹平，從頭再劃一遍。</p>
+<p>中年的那個是在一頓飯之後開口的。</p>
+<p>他把空碗擱在腳邊，背靠著牆，眼睛看著對面的柵。看了一會兒，才說：</p>
+<p>「你是署了字的？」</p>
+<p>「是。」韓敬說。</p>
+<p>「我也是。」他說，「我是別府的，冊上署過一處，他們就把我請來了。」</p>
+<p>他從草裏抽出一根草莖，在指頭上繞。</p>
+<p>「頭一回堂問完，我回來，這屋裏沒有人問我。」他說，「我自己說吧。問官要把署字的人分開。授意的，叫主使；受命的，叫隨署。隨署的輕些。」</p>
+<p>老者的嘴唇停了一下，又動起來。</p>
+<p>「問官這麼分。」中年人說，「不是哪一條上寫的，我也沒讀過哪一條。是他問到後頭，自己說出來的。」</p>
+<p>「你是哪一樣？」</p>
+<p>「隨署。」他說，「上頭叫署，我就署了。」</p>
+<p>草莖繞緊了，他鬆開，看它慢慢彈回去。</p>
+<p>「輕多少？」韓敬問。</p>
+<p>「他沒說。」中年人說，「我也沒問。」</p>
+<p>他把草莖放下，閉上眼睛。過道上的水滴了兩下，又一下。韓敬把兩手從膝上拿開，放在草上。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>第一回叫他，是一個早上。獄吏在柵外喊的是「平川韓敬」，鑰匙在鎖裏轉。他站起來，膝蓋響了一聲，腿是麻的，扶了一下牆。</p>
+<p>過了兩重院子，進了一間長廳。廳不深，地是青磚，磚面被腳磨得發亮，靠門口那一段濕，有人剛潑過水。廳的盡頭是一張高案，案後坐著一個官，案左下角另設一張小案，坐著書吏，面前一方硯，一疊紙，筆已經蘸好了。</p>
+<p>問官五十上下，下頦留著一把短鬚，鬢邊有幾根白。他穿的是常服，不是官袍，袖口挽起一折，露出一截小臂。案上攤著東西，韓敬一眼看過去，認得。</p>
+<p>一部冊，翻開著，是他自己的字。冊旁邊，三張舊紙並排擺著，是皮紙包拆開之後的，折痕很深，四道，是疊成方包時留下的。駁單壓在冊的一角，紙邊軟，四個角起了毛。</p>
+<p>獄吏把他帶到案前站住，退到門邊。門檻外的地上有一道日影，細細的一條，隨著雲過，淡了，又亮起來。</p>
+<p>「平川府持冊吏韓敬？」</p>
+<p>「是。」</p>
+<p>書吏的筆動了。問官等筆聲停了，才問下一句。</p>
+<p>「冊末這一行，攢造，是你署的？」</p>
+<p>「是。」</p>
+<p>「冊上的數，誰填？」</p>
+<p>「我填。」</p>
+<p>「倉收與縣解，兩欄。」問官說，用一根指頭點在冊上，「縣解合計三萬一千二百四十，府倉收數三萬一千零零三。差二百三十七石。你填的時候，知不知？」</p>
+<p>「知。」</p>
+<p>筆在紙上走，走完了。</p>
+<p>問官把冊翻到另一頁，又用指頭點住，點在一行字上。</p>
+<p>「懷陽縣秋糧項下，田畝。舊紙這一張，是一萬二千四百畝；冊內新頁，是一萬二千零四十畝，新頁旁邊署『經手　韓敬』。」</p>
+<p>「是。是我寫錯了位數。」</p>
+<p>「筆誤。」</p>
+<p>「是。」</p>
+<p>問官沒有說什麼，把手挪到另一張紙上。那是三張舊紙最中間的一張，他把它拿起來，翻轉，迎著廳外進來的光看了一眼，放回案上原處。</p>
+<p>「舊紙，府倉各項收數，一行一項，最右一欄是憑，各行注倉簿。」他說，「冊內新頁，底下多一行，折耗，二百三十七石。旁邊署『經手　周進』。憑欄，」他用指頭點了一下，「這一行，空的。」</p>
+<p>「是。」</p>
+<p>「舊紙沒有這一行，新頁有。誰寫的？」</p>
+<p>「頁是周進寫的。」韓敬說，「署是他署的。」</p>
+<p>書吏的筆走了一行。問官抬起眼，看了他一息。</p>
+<p>「周進入戶房，幾時？」</p>
+<p>「三個月。」</p>
+<p>書吏記了。</p>
+<p>「宗卷裏的呈報單，」問官說，「府倉收數三萬一千零零三，是倉上報的實收？」</p>
+<p>「是。」</p>
+<p>「單上有沒有折耗？」</p>
+<p>「沒有。」</p>
+<p>問官把駁單拿起來。</p>
+<p>「這張駁單，第二項，須倉耗憑證或倉底簿。」他說，「憑證，你有沒有？」</p>
+<p>「沒有。」</p>
+<p>「底簿？」</p>
+<p>「倉上說，沒有底簿。」</p>
+<p>「數從哪裏來？」</p>
+<p>「倉上說是折耗。」</p>
+<p>「倉上誰？」</p>
+<p>韓敬沒有答。</p>
+<p>廳裏很靜。廳外有人從廊下走過，鞋底擦著磚，走遠了。書吏的筆尖懸在紙上，沒有落。</p>
+<p>「倉上誰？」問官又問了一遍。</p>
+<p>韓敬看著案角。案角包著一層銅，銅上有一道細細的刮痕。</p>
+<p>「平川倉上管事的，只一個。」問官說，「你不說，問官也問得出。」</p>
+<p>「說，」問官說，「或不說。」</p>
+<p>「我不說。」</p>
+<p>書吏寫了。筆在紙上走了一行，停住，蘸墨，又寫了半行。問官看著他。他把駁單拿起來，看了看，放回原處，用手掌把它壓平。</p>
+<p>「下去。」</p>
+<p>獄吏從門邊走過來。韓敬躬了躬身，轉身，跟著走出去。跨出門檻的時候，他看見廊下有一只水桶，桶邊濺濕了一圈，水順著磚縫流到階前。他的腿已經不麻了。</p>
+<p>回到屋裏，飯盆已經放在柵邊，他那一碗涼了，鹹菜在碗沿上發乾。他坐下，把飯吃完，鹹菜也吃了，苦味壓在舌根，很久沒有散。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>日子過去了。天氣的變化是從桶裏聞出來的：先是悶，臭得發甜，後來漸漸薄下去，草也不那麼潮了。有一夜，過道上很冷，老的那個把兩手攏進袖裏，一直攏到早上。年輕的那個不再哭，吃飯的時候，會用手背擦一下嘴。</p>
+<p>有時獄吏在柵外叫別的府名，叫的是人，遠處應一聲，鑰匙響，腳步去了。有的當日就回來，有的隔幾天才回來，回來的人進了屋，不說話，坐下，臉朝著牆。</p>
+<p>沒有人再叫韓敬。中年人把他自己的那根草莖繞了又拆，拆了又繞，有一回，把它編成一個小小的結，放在腳邊，過了一天，又踩扁了。</p>
+<p>有一天，獄吏開了柵，叫他們四個人出去倒桶。院子小，三面牆，牆根長著一層綠苔，天是一方，很亮，刺得眼睛發疼。他抬著桶的一邊，抬得很穩，走到院子盡頭的水溝邊，倒了，水聲嘩的一下，撲出一股氣味。</p>
+<p>另一道門開了，一隊人過來。前頭一個獄吏，後頭一個，中間是一個戴鎖的人，腳步慢，鎖鏈拖在磚上。那個人瘦了，瘦得頸骨突起，袍子空蕩蕩的，掛在肩上，兩頰往裏陷，鬍子沒有剃，亂亂地長了一圈。是曹貴。</p>
+<p>他走過院子，到溝邊的一段，抬了一下眼。韓敬正好把桶放下。兩人的目光碰了一碰，碰在半空，沒有停，曹貴的眼睛往下垂，看自己的腳，韓敬也轉過身，去看那只桶。鎖鏈響了幾聲，往另一道門去了。</p>
+<p>獄吏在後面說：「回去。」</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>再叫他的時候，是同一間廳，同一張高案。獄吏領他過院子，廊下蹲著一排人，各自靠著柱子，有人抬頭看他，不認得，又低下去。</p>
+<p>廳裏站滿了人。</p>
+<p>案前一排站著，從左到右：高謙，同知袁，曹貴，韓敬，周進。高謙與袁站在左邊一側，各人之間隔著一步，袁的位置更靠後，靠近柱子。曹貴身上的鎖鏈垂到地上，磚上有細微的響。右邊稍遠一點，另立著一個人，穿一件灰布袍，頭微微低著，是杜。</p>
+<p>韓敬走進來，被獄吏領到曹貴與周進中間，站住。</p>
+<p>他先看見的是案前的磚，一塊一塊，磚縫裏嵌著黑泥。然後才看右邊。</p>
+<p>周進瘦了，瘦得耳朵顯出來，脖子細，領口鬆。他身上的衣裳還是那一件，洗過，皺的，肩線塌了一邊。右手垂在身側，三根指頭是白的，指肚上沒有墨，洗得乾乾淨淨，連指甲縫裏也沒有。他腳上的鞋後跟被踩扁了。他看了韓敬一眼，目光落在他臉上，一息，然後移開，看前面的磚。</p>
+<p>韓敬也看前面。</p>
+<p>案後，問官已經坐定。案上比上一回多了東西：除了冊與舊紙三張，案角多一只小柏木匣，匣身貼著一條長紙，從蓋貼到底，上頭有字，有一個押。匣旁邊擱著一本薄冊，封面空白，另有一本黑封皮的簿，翻毛了邊角。</p>
+<p>「平川府，」問官說，「知府高謙。」</p>
+<p>「是。」高謙說。</p>
+<p>「同知袁。」</p>
+<p>「是。」</p>
+<p>「印房吏曹貴。」</p>
+<p>「是。」</p>
+<p>「持冊吏韓敬、周進。」</p>
+<p>兩人各應了一聲。</p>
+<p>「倉大使杜，」問官說，「已拘到。」</p>
+<p>杜的頭沒有抬，只把兩手在袖裏攏緊了。</p>
+<p>「局裏調來的冊與頁，局簿也在這裏；曹貴的底簿，是剛從本處解來的。」問官說。</p>
+<p>問官把眼睛移到案上。廳外有風，窗紙一鼓一鼓，風帶進來院子裏水溝的味道，案上的紙邊也跟著輕輕顫，書吏伸手壓了一壓。</p>
+<p>「署字的人，問官這麼分：授意的，主使；受命的，隨署。」他說，「主印者另論。」</p>
+<p>書吏的筆動了。</p>
+<p>韓敬的眼睛仍看著地磚。他覺得周進的肩在右邊，離他一步，沒有動。</p>
+<p>「先看頁。」問官說。</p>
+<p>書吏站起來，走到案邊，把案上的東西一一理過。他先把舊紙三張並排放正，又把冊翻到對應的頁，依序對照：舊紙懷陽頁，冊內新頁懷陽頁；舊紙倉數頁，冊內新頁倉數頁；舊紙總計頁，冊內新頁總計頁。又把那只小匣捧起來，放在案前，用小刀沿著封紙的邊挑開，封紙是整的，沒有破處，挑開時紙邊發出細細的一聲。他揭開匣蓋，從裏頭一張一張取出紙來。</p>
+<p>「一。」他數，「二。三。」數到三，他又從頭點了一遍，指頭在每一張的邊上按一下，才停。</p>
+<p>三張頁子，紙色同冊內的新頁一樣，邊緣乾淨，邊上一個半圓的印，朱紅，頁面沒有一個字，數欄空空。他把它們疊齊，擱在匣蓋上。</p>
+<p>「備換頁六。」問官說，「用三，封存三。局裏簿上是這樣記的。」他把手放在那本黑封皮的簿子上，沒有翻開，「曹貴。」</p>
+<p>「在。」</p>
+<p>「你的底簿。」</p>
+<p>書吏把那本空白封面的薄冊遞下去。曹貴兩手戴著鎖，接得不穩，鎖鏈響了一聲。他把冊子捧在胸前，用手指翻開，翻過幾頁，每一頁都是潦草的小字，墨色深淺不一，只有他看得懂的記號。</p>
+<p>他把冊子舉起來，朝著案上，鎖鏈從腕上滑下去半截，手指點在一行字上。</p>
+<p>「備換頁六，用印畢，付攢造韓敬。」</p>
+<p>指甲壓在紙上，壓得有點發白。</p>
+<p>「六頁。」曹貴說，聲音啞，像許久沒有用過，「每一頁都印了，一頁沒有虛。印畢，點數，付給他。我只用印，不核數。」</p>
+<p>他的指頭沒有移開。</p>
+<p>「字是他們的。」</p>
+<p>問官看了那一行一會兒，點了一下頭。</p>
+<p>「底簿六，局簿三加三，」問官說，「對得上。收回去。」</p>
+<p>書吏走過去，把底簿從曹貴手裏接了。曹貴的手垂下來，鎖鏈在地上拖了半尺，停住。鏈環碰著磚縫，最後響了一聲，細得像一根針掉在地上。</p>
+<p>「同知袁。」問官說。</p>
+<p>袁往前挪了半步。他的兩手仍攏在袖裏。</p>
+<p>「箱縫的日子是我寫的，押是我畫的。」他說，「裏頭的事，不知情。」</p>
+<p>他往後退了半步，回到柱子旁邊。</p>
+<p>問官轉向高謙。</p>
+<p>高謙站著，穿的是一件舊青袍，領口洗得發白。他的頭髮梳過，用木簪束得緊，兩鬢卻有些亂。他往前一步，兩手在身前交疊，很穩，像在府堂上答上司的話。</p>
+<p>「宗卷無誤否，」他說，「我問過他。他答無誤。」</p>
+<p>「呈報單我看過，單上是實收，對得上倉。縣解我不核，那是縣裏的事。倉上的事，是杜大使管。筆誤一處，他報過。倉上的事，他沒有報。」</p>
+<p>「預蓋印，」問官說，「是誰令的？」</p>
+<p>「是歷來的辦法。」高謙說，「我不過沿用。數，我沒有改過一字。」</p>
+<p>「我只聽韓敬稟報無誤。」</p>
+<p>韓敬的眼睛看著地磚。他看的那一塊磚，邊角缺了一點，缺口裏塞著灰。他把兩手垂著，十個指頭並攏。</p>
+<p>「局裏兩供，」問官說，「念。」</p>
+<p>書吏從案下抽出一張紙，站起來，念得很平，每個字都落在同一個調上。</p>
+<p>「局吏唐供：收頁，因持冊吏言主事有『入冊，署名齊備，局裏就收』語。」</p>
+<p>他停一停，換了一張。</p>
+<p>「局主事供：無此語。」</p>
+<p>廳裏沒有人動。</p>
+<p>問官看著韓敬。</p>
+<p>「唐供是你說的。主事說過這話？」</p>
+<p>「說過。」</p>
+<p>「旁邊有人？」</p>
+<p>「有兩個吏，坐在長凳上，各抱一只匣。」他說，「不認得，不知是哪一府的。」</p>
+<p>「記下。」問官對書吏說，「持冊吏言主事有此語，旁有他府吏二人，不識。」</p>
+<p>書吏寫了。韓敬的兩手仍垂在身側，手指並著，掌心裏有汗，汗順著指縫往下，滴到磚上，沒有聲音。他看著地磚的缺角。</p>
+<p>問官把紙翻過去，拿起另一張，目光轉向右邊。</p>
+<p>「周進。」</p>
+<p>「在。」</p>
+<p>「倉數頁，折耗行旁，經手周進。總計頁，合計行旁，經手周進。」問官說，指頭在新頁上一處一處點過去，「兩處，是你的字？」</p>
+<p>「是。」</p>
+<p>「寫的時候，憑欄那一格是空的，你見著沒有？」</p>
+<p>「見著。」</p>
+<p>書吏記了。問官把指頭從紙上收回來。</p>
+<p>「署的字，」問官說，「誰令你寫？」</p>
+<p>周進的喉頭動了一下。他往前半步。</p>
+<p>「是我自己願署的——」</p>
+<p>「是我讓他署。」</p>
+<p>韓敬的聲音比周進的快。快到後半句擠在前半句的尾巴上，聽起來是同時說出來的。他轉過頭，看見周進的臉，周進的嘴還張著，那半句話停在舌尖。</p>
+<p>「數是我口述。」韓敬說，「他寫，我說。署，是我叫他署。」</p>
+<p>「韓兄不是——」周進說。</p>
+<p>「安靜。」問官說。</p>
+<p>周進把後面的話吞了回去，嘴合上，下巴上一根筋跳了一下。</p>
+<p>問官把筆拿起來，在手裏轉了半圈，放下。</p>
+<p>「周進，數從哪裏來？」</p>
+<p>周進沒有立刻答。他看案上，又看高案後面的牆，牆上什麼也沒有。他的手垂在身側，十根指頭一根一根地鬆開，又並攏。</p>
+<p>「韓兄說的。」</p>
+<p>聲音有點抖，卻沒有躲。</p>
+<p>「自願署的，」問官說，口氣像在說一個數，「算你自己的主意，不算受命。」他頓了頓，「你要不要再想一想？」</p>
+<p>書吏的筆懸著。廳裏的光從門口斜進來，落在磚上，落在周進的鞋尖。他的嘴唇動了一下，沒有出聲。</p>
+<p>問官把目光收回來。</p>
+<p>「記下，」他說，「周進，被問再想，未答。」</p>
+<p>書吏寫了。</p>
+<p>問官轉了方向。</p>
+<p>「倉上的人，」他對著韓敬說，「是不是倉大使？」</p>
+<p>韓敬沒有答。</p>
+<p>「倉大使杜，你說。」</p>
+<p>杜把頭抬起來。他的臉比在寺裏瘦了一圈，鬍子根根看得見，眼睛周圍一圈青灰。他往前走了一步，仍是側著身，朝著案，韓敬只看見他的耳朵與半邊臉，耳垂上有一點汗。</p>
+<p>「倉簿記的是實收，」杜說，「三萬一千零零三，一粒不假。」</p>
+<p>聲音穩，鄉音很輕。</p>
+<p>「折耗的數，我沒有給過。差是他自己算的。」</p>
+<p>廳裏靜。他聽見自己右邊周進的呼吸，短了一下，又續上。</p>
+<p>「韓敬？」問官說。</p>
+<p>他站著，膝後的筋跳了一下。他抬起右手，到了前襟，又把它放下去。放到一半，又抬起來，這一回伸進懷裏，指頭摸到那本小簿的硬角，藍布面，邊角磨白。手停在那裏。</p>
+<p>右邊，周進在看他。他覺得那目光在他的側臉上。左邊，高謙也在看他。</p>
+<p>他把手縮了回來，空的。</p>
+<p>廳裏沒有人說話。書吏的筆尖又滴了一滴墨，在紙上暈開。問官沒有催，兩手放在案上，指頭交扣，等著。</p>
+<p>右邊，周進的嘴唇動了一下，像要再開口，沒有出聲。韓敬的眼角看見了。</p>
+<p>韓敬的右手又抬起來。這一回沒有停，伸進去，捏住那本冊子，抽了出來。</p>
+<p>「我有一本簿。」</p>
+<p>聲音不大，聽見的人卻很清楚。他把簿子握在手裏，手心是濕的，藍布面也濕了一角。</p>
+<p>「藥帳在前頭幾頁，」他說，「能不能還我？」</p>
+<p>問官看著他，看了一息。</p>
+<p>「留作憑據。」</p>
+<p>書吏已經走過來，伸了手。韓敬把簿子放進那隻手裏。書吏轉身，雙手捧上案去，放在問官面前。</p>
+<p>問官翻開。翻得很慢，一頁一頁，指頭壓著紙邊。前頭的字他掃過去，藥名，錢數，日子，一行一行，墨色深淺不一。他翻了四頁，翻到第五頁，又往後翻了幾頁。</p>
+<p>「前頭藥帳。」他說，「後頭呢？」</p>
+<p>「後頭，」韓敬說，「是我記的事。」</p>
+<p>問官把簿子推到案邊，向書吏抬了抬下巴。書吏接過去，翻到一處，站直了，念。</p>
+<p>「六月初六，二百三十七。」</p>
+<p>「七月初四，杜云折耗二百三十七，無簿，無憑。」</p>
+<p>杜的肩膀往上聳了一下。</p>
+<p>「七月初五，口述數，進書倉頁、總頁，署經手。」</p>
+<p>「進云：署我的名？進云：是。」</p>
+<p>書吏翻過一頁，續念：</p>
+<p>「七月十二，收冊，帖一。」</p>
+<p>他念完，闔上簿子，雙手遞回案上。</p>
+<p>廳裏只有書吏袖子擦過紙面的聲音。廊下遠處有人用瓢舀水，舀了幾下，停了。</p>
+<p>「六月初六，」問官說，「你幾時到京？」</p>
+<p>「七月初二。」</p>
+<p>「那你六月就知有差？」</p>
+<p>「是。」</p>
+<p>「船上算出來的？」</p>
+<p>「是。」</p>
+<p>問官點了一下頭，筆在手裏沒有動。</p>
+<p>「七月初五，」他說，「進問你，署我的名。」</p>
+<p>「是。」</p>
+<p>「你怎麼答？」</p>
+<p>「我說，你寫的就是你經手。」</p>
+<p>問官看了周進一眼。</p>
+<p>高謙看著他。他看了很久，眼角的紋路一動不動。</p>
+<p>「你對我說無誤。」高謙說。</p>
+<p>「是。」韓敬說。</p>
+<p>高謙沒有再說話。他的兩手仍交疊著，往下放了一寸。</p>
+<p>杜閉上了眼。</p>
+<p>周進低下頭，看自己的鞋尖，看了一會兒，又抬起來，朝案上看，看的是那本小簿，藍布面，擱在案角，邊上壓著硯臺的影子。</p>
+<p>問官向杜。</p>
+<p>「倉大使杜，簿上記你，云折耗二百三十七。」</p>
+<p>「那是他自己記的。」杜說，眼睛還閉著，說完才睜開，「我沒有見他寫。」</p>
+<p>「記下。」問官對書吏說。</p>
+<p>書吏寫了。問官把筆擱到筆架上，兩手攏在案上，是準備說話的樣子。</p>
+<p>「頁，署名，簿，供，都在這裏。」他對書吏說，「記：韓敬，知差不報，口述令人署，記主使。周進，受命而署，記隨署。倉大使杜，口給無據之數，候另勘。知府高主印、同知袁封記、曹貴主印吏，另論。」</p>
+<p>他說完，案上沒有人動。</p>
+<p>「帶下去。」</p>
+<p>獄吏從門邊走過來，一前一後，把韓敬與周進帶出了列。韓敬先走。經過周進身邊的時候，他們之間只隔著一尺，周進的衣袖擦過他的衣袖，粗布擦粗布，一聲極輕的響。他看的是前面獄吏的背；周進看的是堂前的磚縫。</p>
+<p>出了廳門，廊下沒有桶，磚是乾的。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>回到那間屋，柵門在身後鎖上。</p>
+<p>他走到自己的那面牆，坐下，草在身下響。右手抬起來，習慣地往懷裏去，指頭按在中衣上，是布，是自己身上的體溫，什麼也沒有。他把手停在那裏。</p>
+<p>老的那個依舊閉著眼，唇動。年輕的那個抱著膝，下巴擱在膝頭。</p>
+<p>中年的那個背靠牆，把一根草莖在指頭上繞。他看了韓敬一眼，又看回草莖。他什麼也沒有問。</p>
+<p>草莖在他指頭上繞緊了，鬆開，又繞緊。</p>
+                </div>
+            </article>
+            <article id="ch09" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 9 章</span>
+                        <span class="badge-date">4,304 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第九章：名單</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>草又薄了一層。</p>
+<p>先前還有一點軟，躺下去，背脊底下墊得住；現在草梗一根一根都壓扁了，貼在地上，顏色也從黃變灰，坐上去，隔著衫子就覺出泥地的涼。夜裏冷得比先前早，老的那個把兩手攏在袖裏，不再等到天亮才攏，天一黑就攏了。蚊子沒有了。</p>
+<p>桶裏的味道薄了。過道上的腳步聲也變了，先前是拖著的，現在是踩著的，一下一下，每一下都聽得清。有一天韓敬忽然發覺，輪到抬桶，他已經不把臉轉向牆了。</p>
+<p>沒有人再叫他。獄吏在柵外喊別府的名字，喊一個，遠處應一聲，鑰匙響，腳步去了。有的回來，有的不回來。回來的人進了屋，坐下，不說話。這屋裏的四個人也不說話，飯來了，各人把碗接過去，吃完，碗推到柵邊。</p>
+<p>他想起母親的藥。</p>
+<p>想起來的時候，手先動了。他的右手去摸懷裏，什麼也沒有，便放在草上，用食指劃。</p>
+<p>先劃當歸。草軟，劃不出痕，指頭一過，草梗彎下去，又彈起來。那是小簿上最後那一方：當歸二錢，黃耆三錢，白朮兩錢。三味，一行，寫在草上看不見，只有指肚知道筆畫走到了哪裏。</p>
+<p>藥鋪的先生寫方子，字小，藥名之間留一個指頭寬的空。母親不識字，卻認得這一張，拿到手裏先看長短，短了，她就問：「怎麼少了一味？」他便說，鋪裏沒有了，換了別的。母親說：「換的，錢也換？」</p>
+<p>他劃完了，把掌心壓上去，從左抹到右，草梗平平地伏下去，什麼也沒有。他又劃了一遍。</p>
+<p>中年的那個背靠牆，在看他的手。看了一會兒，轉開臉，去看柵外的過道。</p>
+<p>過道上有人咳了一聲。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>有一天飯裏有一點油星，浮在粥面上，年輕的那個把碗舉到眼前看了半天，才喝。老的那個喝得很慢，喝完，把碗底舐了，又把碗沿舐了一圈。獄吏說，是過節的緣故，沒有說是什麼節。</p>
+<p>飯是午前來的。獄吏把盆推進柵縫，盆底拖過泥地，那一聲韓敬已經聽慣了。這一回獄吏沒有立刻走。他蹲下身，把四只碗一一擺正，嘴裏嘟囔著什麼，對著自己的腳。</p>
+<p>「宮裏下詔了。」他說，「說是天上出了異象，叫人說話。」</p>
+<p>沒有人接。</p>
+<p>他擺完碗，站起來，膝蓋上拍了拍灰，走了。年輕的那個把碗接過去，捧在手裏，看著碗裏的鹹菜。老的那個睜開眼，嘴唇停了，又動起來。中年人哼了一聲，不知是應，還是咳嗽。</p>
+<p>鑰匙在遠處一道門上響了兩下。那一頭有人用瓢刮缸底，刮得很響，刮完，又靜了。</p>
+<p>韓敬把碗端起來。飯是溫的，米粒一粒一粒，嚼得出涼，鹹菜苦，咬下去有砂，硌在牙上。他吃得比平常慢，吃到一半，碗擱在膝上，抬頭看小窗。窗外只有一塊白，什麼也看不見，雲或者天，分不出。他又把碗端起來吃。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>開柵是一個早上。光塊還在地上，沒有爬到牆。</p>
+<p>兩個獄吏來，一個開鎖，一個站在後頭。「那個，」開鎖的說，用下巴指，「別府的，你。還有那個老的。」</p>
+<p>中年人坐著沒有動。他把腳邊那根草莖拿起來，在指頭上繞一圈，放下，才站起來，拍衫後的草。他動作不慌，站穩了，把衣襟理平。</p>
+<p>老的那個仍閉著眼。獄吏等了一等，叫旁邊的人進來，兩個，一邊一個，把老者的胳臂架起來。他的腳拖在草上，草梗被腳跟犁出兩道淺淺的溝。他的唇一直在動，不出聲。</p>
+<p>中年人走到柵邊，停住，回過身。</p>
+<p>他看的是韓敬，也看這間屋。他的臉上沒有什麼，平平的，與頭一回說「我自己說吧」的時候一樣。</p>
+<p>「我的是榜一百，戍遠方。」他說。</p>
+<p>屋裏沒有人動。</p>
+<p>「你上回問，輕多少。」他說，「輕多少，就是這麼多。」</p>
+<p>他把手放在柵上，木頭是潮的，他的手按了一下，又拿開。</p>
+<p>「你的，」他說，「上頭還沒下來。」</p>
+<p>說完他轉過身，跟著獄吏走了。老者被架在後頭，鞋掉了一只，有人彎腰撿起來，塞回他腳上。腳步聲拐過過道，到了盡處，一道門開，一道門關，過道上靜下來。</p>
+<p>草上有兩處被壓出的凹，一處大，一處小。那根草莖還在中年人坐過的地方，被腳踩出一個折。</p>
+<p>韓敬坐著，兩手擱在膝上。</p>
+<p>年輕的那個抱著膝，下巴擱在膝頭，看著空出來的地方。看了一會兒，他把身子往旁邊挪了一尺，挪到老者靠過的牆根去，背貼上去，又貼不住，往下滑了一點。</p>
+<p>飯來了。四只碗，只有兩人接。獄吏把另兩碗端走。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>柵外的過道上，這一整天都沒有人經過。咳嗽的人在，遠處有一扇門開了又關，關得很重，震得小窗上的灰簌簌往下落。年輕人伸手去接，接了一點在掌心，看了看，吹掉了。</p>
+<p>新來的人是在第二天進來的。</p>
+<p>他進來時天已經暗，過道上沒有光，只聽見鑰匙響，柵門開，一個人被推進來，跌了半步，扶住牆。鎖又響了。</p>
+<p>他站著，站了很久，才摸索著蹲下去，蹲在離柵最近的一處，離韓敬與年輕人都有一段。屋裏很黑，看不見臉，只有呼吸，粗，發急。</p>
+<p>夜裏他沒有睡。過道上有人走過，提著一盞燈，燈光從柵縫裏一格一格地掃過去，掃過草，掃過牆，掃過他的臉，又走遠了。韓敬聽見他把草一把一把地抓起來，又放下，抓起來，又放下。</p>
+<p>天亮了。看清了，是個四十上下的人，圓臉，下巴上有一粒痣，穿的是一件舊棉袍，領口油亮。看他的手，指肚粗，指甲短，不像吏，像做過買賣的。他把背靠著柵，眼睛睜得很大，直直看著對面的牆。</p>
+<p>飯來，他不吃。獄吏在柵外說：「不吃就餓著。」他才捧起來，扒了兩口，嗆了，咳得彎下腰去。</p>
+<p>年輕人抬起頭。</p>
+<p>「哪府的？」年輕人問。聲音啞，是許久沒有對人說過話。</p>
+<p>「我不是吏。」新來的人說，說得很快，「我是庫裏的。我不是署字的人，我是替人跑腿的，我弄不清楚——我被他們帶進來，是因為……」</p>
+<p>他停住了，不知道自己要說什麼。</p>
+<p>「別問了。」年輕人說，把碗端起來，臉轉開。碗沿碰在牙上，響了一聲。</p>
+<p>過了兩天，他自己開了口。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>刑名是這麼傳進來的。</p>
+<p>不是一次，是一點一點，像滲。獄吏送飯時有一句沒一句，有時是對著盆說，有時是對著牆；新囚聽了，夜裏睡不著，坐起來，對著黑，一句一句地學給屋裏的人聽。</p>
+<p>頭一回是個傍晚。盆剛推進來，他把碗拿起來，沒有吃，捧在手裏。</p>
+<p>「你們是平川的？」他說。「獄吏說，這屋裏有平川來的。」</p>
+<p>韓敬看了他一眼。</p>
+<p>「是。」</p>
+<p>新囚點了一下頭，把碗湊到嘴邊，又放下。</p>
+<p>「聽說，」他說，「獄吏說，那個知府，是論死。」</p>
+<p>年輕人把頭抬起來，又低下去，扒了一口飯。</p>
+<p>「獄吏說，同知，榜一百，戍遠方。」新囚說，「印房那個，也是一百，也是遠方。」</p>
+<p>韓敬把碗放在膝上。碗是涼的，隔著衫子，涼從膝頭傳上來。</p>
+<p>過了一晌，新囚又說：「獄吏說，倉上那個，是罰，賠。倉裏缺的那一項，叫他賠。家裏有屋，賣了抵。」</p>
+<p>韓敬的手指在草上停了一下。他把手從草上拿起來，擱在膝上。又拿下去，按在草上。</p>
+<p>「局裏那個吏，」新囚說，「獄吏說，問過兩回，罰了俸。人還在局裏。」</p>
+<p>他說完，咬了一口鹹菜，皺起眉，嚥了。</p>
+<p>隔了一夜，他又說了一回。這一回他說得慢。</p>
+<p>「小的那個，」他說，「周進，是這個名吧？獄吏說，他是隨署，和前些日走的那個別府吏，同一等。」</p>
+<p>屋裏靜了。</p>
+<p>「大的那個，」新囚說，沒有看韓敬，看著柵外的過道，「獄吏說，上頭還沒下來。」</p>
+<p>他說完，把兩手攏進袖裏。</p>
+<p>「是聽說的。」他又說了一句，「我沒有親眼見。」</p>
+<p>他把頭低下去，不說話了。年輕人把碗裏剩的一口飯慢慢扒乾淨，扒完，用指頭把碗沿上的一粒米捏起來，放進嘴裏。</p>
+<p>韓敬坐著，兩手垂著。屋裏沒有人再開口。過道上水滴了三下，停了，才又滴一下。</p>
+<p>他把碗裏最後一點飯扒乾淨，又把碗沿舐了一遍。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>說是這麼說，一天又過一天。</p>
+<p>天更涼了。獄吏送飯的時候，盆裏的飯不再冒熱氣，鹹菜上結著一層薄薄的鹽花。有一回早上起來，牆根的草上有一層白，不是霜，是潮氣凝出來的，手摸上去，濕冷。獄吏的鞋底踩在過道上，聲音也比先前脆。</p>
+<p>新囚的話漸漸多了，多是些沒頭沒尾的。他說他是庫上的，替一個吏管過幾回箱，箱裏有什麼他不知道，只管搬。他說他被問了兩回，問官問得不兇，只是一遍一遍問同一件事，問到他自己也不確定了。他說他在別的屋聽人說，家裏有人的，獄裏准寫一張紙，託平川來的差人捎回去。他說外頭風聲緊，他在庫裏時就聽說各府的冊子都被調到臺裏來了，一府一府地看，看了就抓人。</p>
+<p>「這一案，」他說，用指頭在草上點，一下，兩下，「進來的有幾百人。放出去的，沒有幾個。」</p>
+<p>他說得很輕。年輕人只把兩手往袖裏又攏了攏。</p>
+<p>韓敬坐在牆根，看著自己的手。指肚上沒有墨，他想起來，已經很久沒有拿過筆。指甲縫裏有泥，是草上帶的，他用拇指的指甲去摳，摳出一點黑，彈掉。</p>
+<p>他又用指頭在草上劃。</p>
+<p>當歸二錢。黃耆三錢。白朮兩錢。</p>
+<p>中年的那個不在了，沒有人看他的手。年輕人偶爾抬頭，又低下去。新囚看了一會兒，沒有問。他把兩腿屈起來，下巴擱在膝上，看著韓敬的指頭。韓敬劃完，用掌心抹平。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>倒桶是輪到的，院子就那麼大。</p>
+<p>這一天獄吏開了柵，叫他們出去，四個人，兩個抬桶，兩個空著手。院子還是那個院子，三面牆，牆根的苔不綠了，發黑，貼在磚上，黑得像舊墨。天是一方，很高，很白，沒有雲，沒有鳥，看得久了，眼睛發酸。</p>
+<p>韓敬抬桶的一邊，新囚抬另一邊。桶比平日重，晃得厲害，新囚的腳步亂，每一步都先探出去再落下，桶裏的水往外潑，濺在韓敬的鞋上。他把桶抬穩了，走到溝邊，倒了。</p>
+<p>水聲嘩的一下，撲出一股氣味。溝裏的水是黑的，流得很慢，水面上漂著幾根草，打著轉，過了磚縫，不見了。</p>
+<p>他把桶放下，直起腰。這時，另一道門開了。</p>
+<p>一隊人進了院子。前頭一個獄吏，後頭一個，中間幾個人，兩個抬桶，兩個空手，空手的那個走在最後。</p>
+<p>他先看見的是鞋。</p>
+<p>鞋後跟被踩扁了，露出腳後跟的一截，腳後跟的皮是白的，起了皺。鞋往上是褲腳，布洗得發薄，膝蓋處兩塊補丁。再往上，袍子空蕩蕩的，肩線塌了一邊。</p>
+<p>是周進。</p>
+<p>他瘦得比在堂上更多。脖子細細的一根，領口鬆，耳朵顯得很大。頭髮沒有梳，用一根草繫著。他的右手垂在身側，三根指頭，白，指肚上沒有墨，一點也沒有，指甲剪過，剪得很短，邊上有一道破口。</p>
+<p>院子小。兩隊人要擦過去，只有溝邊那一段窄路。獄吏在後面說：「靠邊，靠邊。」他的鞋底刮著磚，把一塊濕泥蹭開。</p>
+<p>韓敬往牆邊側了半步。</p>
+<p>周進走過來，走得不快，也不慢，眼睛看著前頭的磚。離韓敬還有三步，兩步。</p>
+<p>「再問你，」韓敬說。</p>
+<p>聲音很低，低得只有近處聽得見。他沒有轉頭，眼睛也看著磚。</p>
+<p>「就說是我叫你署的。」</p>
+<p>周進沒有停步。</p>
+<p>他的腳步聲還是那樣，鞋後跟拍在磚上，啪，啪，一下一下。他沒有轉頭，沒有看韓敬一眼，他的肩在韓敬眼角邊過去，衣袖擦過韓敬的衣袖，粗布擦粗布。</p>
+<p>「你不必替我說。」</p>
+<p>只這一句。</p>
+<p>說完，他的腳步沒有變，走到溝邊，抬桶的人把桶放下，他站在一邊，等。</p>
+<p>獄吏說：「快些。」</p>
+<p>兩隊人錯開了。韓敬被獄吏推了一下，往回走，他回頭，周進的背影在溝邊，後頸上有一小塊皮被衣領磨紅了。他沒有回頭。</p>
+<p>回到屋裏，柵門鎖上。鎖舌落進去，響了一聲，跟每一回一樣。他在柵前站著，聽獄吏的腳步走遠，才轉身。</p>
+<p>韓敬坐下，坐在自己的那一塊草上。年輕人與新囚也進來了，各坐各的。他把右手攤開，看了看，又握起來，又攤開。</p>
+<p>草是涼的。他的手指一根一根地按在草上，不是劃，只是按，按下去，草梗彎了，抬起來，草梗又立著。</p>
+<p>「那個人，」新囚忽然說，「是你什麼人？」</p>
+<p>「同寓的。」韓敬說。</p>
+<p>「他跟你說了什麼？」</p>
+<p>「沒有什麼。」</p>
+<p>新囚看著他，嘴張了張，沒有再說，把臉轉開了。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>第二天又是倒桶。</p>
+<p>韓敬在醒的時候就知道。不是獄吏說的，是他自己知道，是早上聽見鑰匙的聲音，就知道。他坐著，兩手放在膝上，等。</p>
+<p>這一回他們先出去，還是四個人，還是那條路，還是那一方天。他這一回抬的是桶的另一邊，與新囚換了，新囚沒有說什麼。</p>
+<p>桶倒了。他放下，站在溝邊，沒有直腰，先看那道門。</p>
+<p>門開了。</p>
+<p>還是那一隊。周進仍走在最後，空著手，鞋後跟仍然是扁的。</p>
+<p>韓敬往牆邊走了兩步。這一回獄吏沒有說「靠邊」，他自己先靠了過去，背幾乎貼著牆，牆上的苔是濕的，隔著衫子，涼了一片。</p>
+<p>周進走過來。</p>
+<p>「我說的是真的。」</p>
+<p>韓敬說。聲音比昨日大了一點，他自己也聽出來了，把後面的話壓下去，只剩這一句。</p>
+<p>周進沒有應。</p>
+<p>他沒有慢，也沒有快。他的腳落在磚上，鞋後跟拍一下，又拍一下。他的目光仍落在前頭，落在溝邊那一小片濕地上。他走過去了，袖子沒有碰到。鞋後跟拍在磚上的聲音遠了一些，到溝邊，停了。</p>
+<p>韓敬站著。</p>
+<p>「看什麼？」獄吏說。</p>
+<p>他把眼睛收回來，轉過身，拎起桶的一邊。新囚在對面等著，手已經握在桶沿上。</p>
+<p>回去的路上，他的鞋踩在磚縫的濕泥裏，滑了一下。他穩住了。院牆根下有一只破碗，扣在苔上，碗底朝天，積著半碗雨水。</p>
+<p>那一天的飯，他吃得很快。吃完，沒有舐碗，把碗推到柵邊，坐回牆根。</p>
+<p>新囚看了他兩回，沒有開口。年輕人臉朝裏，睡了，或是裝睡。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>他在柵邊站住，是又隔了幾日。</p>
+<p>獄吏來收碗，蹲下去，一只一只摞起來。他把最後一只碗拿走時，韓敬從牆根站起來，走到柵前。膝蓋響了一聲。</p>
+<p>「我的呢？」</p>
+<p>獄吏抬頭看他，看了一息。他的臉是長的，下頦有一道疤。</p>
+<p>「什麼你的？」</p>
+<p>「刑名。」韓敬說，「我的。」</p>
+<p>獄吏把碗摞好，抱在胸前，站起來，鑰匙在腰間響了一下。</p>
+<p>「上頭還沒下來。」</p>
+<p>他說完，轉身走了。腳步在過道上去遠，鑰匙一道門一道門地響，最後一聲是很遠的地方，被牆吞掉了。</p>
+<p>韓敬站著。柵是潮的，手握上去，木頭的紋路硌著掌心。他站了一會兒，才鬆開手，走回牆根，坐下。</p>
+<p>草在身下響了一聲，薄薄的。</p>
+<p>他把右手放在草上，食指伸出去。</p>
+<p>當歸，二錢。</p>
+<p>黃耆，三錢。</p>
+<p>白朮，兩錢。</p>
+<p>草梗彎下去，又彈起來。他劃完，沒有立刻抹，指頭停在最後一筆的地方，停了一會兒。</p>
+<p>他又從頭劃了一遍。</p>
+                </div>
+            </article>
+            <article id="ch10" class="chapter-card">
+                <header class="chapter-header">
+                    <div class="chapter-badge">
+                        <span class="badge-seq">第 10 章</span>
+                        <span class="badge-date">3,960 字</span>
+                    </div>
+                    <h2 class="chapter-main-heading">第十章：藥單</h2>
+                    <div class="chapter-divider-line"></div>
+                </header>
+                <div class="chapter-body">
+<p>獄吏在柵外叫「平川韓敬」的時候，天才剛亮。</p>
+<p>他站起來，把衫子後面的草屑拍了拍。年輕的那個抬了一下頭，新囚把背往牆上貼緊些，沒有人說話。</p>
+<p>走的不是往長廳去的那條路。獄吏在前頭，鑰匙一步一響，領他出了過道，過一道小門，進了院子。</p>
+<p>院子裏有人。他站住，獄吏在後頭沒有催。</p>
+<p>一隊人沿著牆根站著，腳踝上穿著一根長鏈，一個挨一個，鏈子拖在磚上，彎彎地繞過去。最前頭是同知袁，青袍洗得發灰，兩手攏在袖裏，下巴收著，看地。旁邊是曹貴，比溝邊那一回又瘦了，兩腕仍戴著鎖，頭髮是亂的。再過去是周進，頭髮用一根草繫著，站在隊尾偏外的地方。另有十來個人，穿各樣衣裳，是別府的，有兩張臉他在廊下蹲過的人裏見過。</p>
+<p>沒有人看他。</p>
+<p>院邊擺著一張桌，桌後坐著一個吏，桌上攤一本簿，簿旁一溜東西：腰帶，荷包，木梳，一捲繩，幾個小布包，各用一張紙條壓著。獄吏把韓敬領到桌子側邊，說「站著」，自己走過去，拿起簿，一個一個叫。</p>
+<p>「袁。」</p>
+<p>袁往前挪了一步，鏈子牽著後頭的人也動了一動。桌後的吏把一條腰帶和一只荷包推過去。袁接了，把腰帶在手裏繞了兩繞，沒有繫，夾在臂彎裏。</p>
+<p>「曹貴。」</p>
+<p>曹貴兩手戴著鎖，只能併著接。桌上是一方帕子，疊得整齊，不知收了多久，邊上有一道舊摺痕。他把它按在胸前，才發覺沒有地方放，又這樣按著。</p>
+<p>一個一個叫過去，叫的都是別府的人。腰帶，木梳，繩。有一個人領到荷包，把口撐開，一枚一枚數裏頭的錢，數了一遍，又數一遍，才收起來。有一個人領到木梳，往頭上梳了一下，梳齒卡在亂髮裏，拉不動，他停了手。</p>
+<p>早上的風從院牆上頭下來，帶著一點潮，帶著水溝那邊的氣味。隊裏有人縮著脖子，有人把兩手互相搓。袁站得最直，袖子裏攏著的手一動不動，衣擺被風掀起一角，他也沒有去按。桌後的吏叫一個，劃一筆，筆尖在簿上走得很快，叫完一個，便要等鏈子牽動，等那人走回原處，才叫下一個。</p>
+<p>「周進。」</p>
+<p>周進往前走了半步。鏈子扯住了他，他等後頭的人也動了，才走到桌前。</p>
+<p>桌後的吏拿起一只藍布小包，捏了捏，是硬的。繫口一個死結，還在，紮得很緊。</p>
+<p>「墨。」他說，自己對自己，把包擱到桌邊。</p>
+<p>周進伸手接了。他把包夾在腋下，用手臂壓住，看了看，又往上提了提。包角露出一截麻線頭，他用兩根指頭把它塞回結裏。他的指肚上還是沒有墨。</p>
+<p>韓敬站在桌子側邊。獄吏催了一聲，說「走」，他才抬步，沿著院邊往堂那一頭去。要經過隊伍前頭，兩隊之間隔著五六步的磚。</p>
+<p>他走過去的時候，周進抬了眼。</p>
+<p>看他。一息。</p>
+<p>然後轉開，看牆根。腋下那只包被他夾得更緊了些。</p>
+<p>袁看地，曹貴看自己手裏的帕子。隊伍裏沒有一個人出聲，只有鏈子在磚上響，響一下，停，又響一下。</p>
+<p>院角蹲著兩個人，穿皂衣，腰上沒有牌，各捧著半張餅，啃一口，嚼一陣。口音是本地的，是他自己的鄉音，他走過時聽見其中一個說：「天這麼冷了，路還長。」另一個沒有接，把餅屑拍在地上。</p>
+<p>隊裏有個人，是那十來個之中的，嘴裏低低說了一句。聲音不大，說的是「宮裏下了詔，興許」，對著蹲在院角的差人，也像是對著自己。</p>
+<p>獄吏把頭轉過去。</p>
+<p>「興許個屁。」他說，嗓子是啞的，口氣很粗，「還指望詔書放人？詔書是叫人說話的，不是放人的。」</p>
+<p>那個人把嘴合上了。</p>
+<p>獄吏轉回來，看了韓敬一眼，鑰匙響了一下，說：「走。」</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>長廳還是那個長廳。青磚，高案，案左下角的小案。門檻外一道日影，這回是穩的，沒有雲。</p>
+<p>案上比上一回空。冊與舊紙三張不見了，匣也不見了，只案角放著一本藍布面的小簿，邊角磨白，下面壓著一張紙。他看見了，沒有看第二眼。</p>
+<p>問官已經坐著。五十上下，短鬚，鬢邊的白比先前多了兩根，穿常服，袖口挽著一折。書吏在小案後頭，筆已蘸好。</p>
+<p>獄吏退到門邊。</p>
+<p>「平川府持冊吏韓敬。」</p>
+<p>「是。」</p>
+<p>問官向書吏偏了偏頭。</p>
+<p>書吏站起來，雙手拿一張紙，念得很平，每個字落在同一個調上。</p>
+<p>「平川府持冊吏韓敬供：冊末攢造署，是我。倉耗項下，數為我口述，令周進書並署。六月知差，七月對知府言無誤。所供屬實。」</p>
+<p>他念完，等了一等，把紙放到案沿上，朝韓敬轉過來。</p>
+<p>廳裏很靜。廳外廊下，有人把一只桶放到磚上，木底碰著石，響了一下。</p>
+<p>「有不實，可改。」問官說，在看自己的指頭，「要辯，可再具一狀。」</p>
+<p>「不辯。」韓敬說。</p>
+<p>問官抬起眼。</p>
+<p>「署。」</p>
+<p>書吏取筆，在硯邊颳了颳，兩手遞過來。筆桿是溫的，是他剛握過。韓敬接了，走到小案前，紙已經擺在案沿，供詞三行，行末空著一格，印好的框。他彎下腰，把三行字從頭看到末，每一行看完，眼睛在行末停一下，再走下一行。看完，筆尖蘸得不多。</p>
+<p>寫「韓敬」。</p>
+<p>兩個字，每一豎都往下拖了一點，拖得與二十年來一樣長。寫完，他把筆擱在硯邊。</p>
+<p>書吏把紙取回去，對著廳外的光看，墨還潤，他用掌沿托著，走到案前，放在那本小簿的旁邊。</p>
+<p>「供狀存臺。」問官說，仍是對書吏說的，「附卷。」</p>
+<p>書吏應了，回到小案，拿起筆，在另一張紙上寫了一行，是登記的字。</p>
+<p>「可還有話？」問官問。</p>
+<p>「沒有。」</p>
+<p>「刑名上頭定，」問官說，口氣與念紙的人一樣平，「不在這裏宣。」</p>
+<p>韓敬點了一下頭。</p>
+<p>問官把筆拿起來，又放下。</p>
+<p>「獄中入者，」他說，「准一紙家書，託平川差人帶回。」</p>
+<p>「一紙。」</p>
+<p>「一紙。」</p>
+<p>書吏已經從小案下面抽出一張白紙，裁過，半幅，雙手遞出來。紙不大，比手掌長一點，紙邊是齊的。又取了一支筆，筆毫禿了半邊，蘸好墨，遞過來。</p>
+<p>韓敬兩手接了。</p>
+<p>書吏還有一件事。他把案上另一張折好的紙，順手往前推過來，推到韓敬手邊的案角，隔著一寸的距離，沒有看他。</p>
+<p>「前頭藥帳，」他說，聲音比念供時低，「抄案時多抄了一份。照這個寫，免得錯。」</p>
+<p>問官在看那張供狀，指頭一行一行往下，看到署處，停了一下，翻過去。</p>
+<p>韓敬把那張折好的紙拿起來。紙薄，折成三折，邊上有一個小墨點。他展開。</p>
+<p>只一行，是書吏的字，小而工整，沒有寫日子，也沒有寫價：</p>
+<p>當歸二錢，黃耆三錢，白朮兩錢。</p>
+<p>他看了它。藥名之間留著一個指頭寬的空，一行的長短，就是藥鋪的方子那麼長。</p>
+<p>他把抄本放在案邊。案是舊木頭，邊上有一道深深的刀痕，不知誰留的。他用右手的掌根，從摺痕上壓過去，壓過一遍，又壓一遍，把三道折痕撫平。紙上那個小墨點被他壓進掌心的紋裏，抬起手，還在。</p>
+<p>書吏已經坐回小案後頭，筆在紙上寫別的事，寫得很快。</p>
+<p>案角那本藍布面的小簿，仍在原處，邊上壓著硯臺的影子。問官的手從上面過去，沒有拿起，也沒有看它。</p>
+<p>「簿留臺。」他說，聲氣平常，像說案上放著一把尺。</p>
+<p>「是。」韓敬說。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>廊下有一張矮案，是堂角那一頭，挨著柱子，柱腳下有一圈洗不掉的水印，案面被人用過，邊上凹了一塊，積著一點灰。獄吏站在三步外，背朝著他，看院子。韓敬把紙鋪在矮案上，蹲下去。</p>
+<p>紙是半幅，窄。一行字，直著寫，寫在紙的中間，旁邊留一條邊，旁注才放得下。他把抄本放在左手邊，攤開，用指頭按著一角。</p>
+<p>他先把筆在掌心試了試。毫是禿的，吃墨多，一點就洇開，他蘸得很少，在硯邊把多的刮掉，又在掌心試了一回，這才落到紙上。硯是書吏小案上那一方，不知誰端了出來，放在案角，墨已經磨好，不濃不淡。</p>
+<p>寫第一個「當」字。</p>
+<p>他寫得慢，寫完「當歸二錢」，空一個指頭寬，寫「黃耆三錢」，又空，寫「白朮兩錢」。三味放在一行，一行的長短，同鋪裏先生寫的差不多，母親拿到手裏，看了長短，就會知道沒有少。</p>
+<p>寫完，他把抄本移開，看紙上還餘下大半。</p>
+<p>他沒有再寫別的。廊下有風，把紙角吹得微微翹起，他用左手壓住。</p>
+<p>獄吏在三步外咳了一聲，不是催，只是咳。</p>
+<p>筆尖移到一旁，在紙的邊上，一行小字，寫得比方子還小：</p>
+<p>「母親不識字，請念與她聽：這是這個月的方，照舊抓。」</p>
+<p>寫到「抓」字，最後一豎拖下去，拖出了紙邊一點，他把筆提起來，沒有改。</p>
+<p>署。</p>
+<p>「韓敬」。兩個字寫在旁注的下頭，與供狀上那兩個一樣，豎往下拖。</p>
+<p>他把筆擱在案上，把紙拿起來，對著嘴，吹了吹。紙上的字黑了一層，亮亮的，慢慢啞下去。他把紙對折，再折一折，折成一個窄窄的方條，用拇指把折痕壓實。</p>
+<p>那張抄本，他照原來的三折折回去，擱在矮案的邊上，邊與案沿對齊。</p>
+<p>獄吏回過頭：「寫完了？」</p>
+<p>「寫完了。」</p>
+<p>「去那邊。」</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>院角那兩個人已經吃完了餅，一個蹲著，一個靠牆站著，手揣在袖裏。戍隊還在牆根站著，桌後的吏正把簿子合上。</p>
+<p>獄吏領他到院角，下巴朝那兩個一點：「平川的。有家書。」</p>
+<p>蹲著的那個抬起頭。臉黑，顴骨高，鬍茬沒刮。</p>
+<p>「給誰？」</p>
+<p>「後巷韓家。」韓敬說，「我母親。她不識字。」</p>
+<p>「那誰念？」</p>
+<p>「鄰人，識字的就行。」</p>
+<p>那人站起來，伸手。韓敬把方條遞過去，那人沒有展開，在手心裏翻了一下，看了看摺口，塞進袖裏，又用手在袖外按了按。</p>
+<p>「後巷，」他說，「老太太有咳喘那一家。」</p>
+<p>「是。」</p>
+<p>「知道了。」</p>
+<p>「有口信沒有？」</p>
+<p>「紙上有。」</p>
+<p>「就一張紙？」</p>
+<p>「就一張。」</p>
+<p>矮的那個伸過頭，朝他袖口看了一眼。「寫的什麼？」</p>
+<p>「方子。」</p>
+<p>「方子？」</p>
+<p>「母親的藥，」韓敬說，「長年吃的。」</p>
+<p>矮的抬頭往天上看，算著什麼。「我們還得等批，」他說，「隊走了，批才下，批下了才動身。」</p>
+<p>「是。」</p>
+<p>蹲著的那個重新蹲下去，從地上撿起一根草梗，在牙縫裏剔。</p>
+<p>韓敬沒有走。他站在那裏，看著自己空了的手，過了一會兒，開口，問得很平常，像問一個過路的人。</p>
+<p>「戶房韓家的，你們出來時，怎樣？」</p>
+<p>兩個差人互相看了一眼。靠牆站著的那個先答，是個矮的，嗓門粗：</p>
+<p>「月糧停了。吏被逮，家裏不給。」</p>
+<p>蹲著的把草梗吐了。「老太太還在老屋，」他說，「領著孩子。」</p>
+<p>「倉上杜家的，」矮的接過去，「屋要賣了，抵倉缺。」</p>
+<p>說完，他往地上啐了一口，不是啐誰，只是啐。</p>
+<p>韓敬沒有再問。</p>
+<p>院子那一頭，獄吏已經把大門開了一扇。門軸澀，轉得很慢，吱的一聲長音，門外的光漏進來，一條，變寬，落在磚上，隊伍的影子都落在上面。桌後的吏站起來，用簿在手心拍了一下，戍隊就動了。</p>
+<p>最前頭的人邁步，鏈子牽直，後頭的人跟著，一節一節。袁走在第二。曹貴把帕子塞進襟裏，還是用鎖著的兩手按著。周進走在中間。韓敬站在院邊，離門有十幾步，離他們的路更近，兩個差人在他左手邊，一個在剔牙，一個把手揣得更深。</p>
+<p>隊伍一個一個走進那一扇門，每個人進去，身形都被門外的光吃掉半邊。鏈子響成一串，磚上的，門檻上的，門外石板上的，聲音變了幾回。</p>
+<p>最後一個人過了門。獄吏用肩把門推回去，推到只剩一道縫，又用手掌往上托，把門閂上。</p>
+<p>鎖聲遠了。遠到只剩一點，被院外街上的什麼聲音蓋過去，再聽，沒有了。</p>
+<p>院子空了。桌後的吏把剩下的紙條一張一張收攏，捋齊，壓在簿下，桌面上只餘幾道被東西壓過的淺痕。牆根的磚上，隊伍站過的地方有一長條濕，是鏈子拖出來的，在亮裏慢慢變淡。</p>
+<p>院角的兩個差人也動了。矮的整了整袖，往另一道門去，蹲著的那個跟上去，走過韓敬身邊，沒有看他，袖子裏有一個地方鼓著，一個窄長的小方條。</p>
+<p>獄吏說：「回去。」</p>
+<p>他應了，轉過身，離開院角時，袖子被牆根的一叢枯草掛了一下，他把它扯開。</p>
+<div class="scene-divider">◇ ◇ ◇</div>
+<p>回去的路與來時一樣。過了小門，是過道，木柵一間挨一間，有人把臉貼在柵上，有人沒有。他走過去，數著腳下的泥，一步，一步，泥還是半濕的，黏鞋。有一間柵裏在唱什麼，聲音很低，不成調，只唱了半句，停了。</p>
+<p>回到過道盡處那一間，水還在滴，滴的間隔與出去之前一樣。鑰匙在鎖裏轉，柵門開了，他低頭進去，門在身後合上。獄吏的腳步往回走，一步，一步，遠了。</p>
+<p>年輕的那個還抱著膝，抬頭望著他。新囚坐在柵邊，離他剛才的位置近了一尺，大概是趁這一陣挪的。</p>
+<p>「叫你出去，」新囚問，「作什麼？」</p>
+<p>「署了一個名。」韓敬說。他想了想，又說：「寫了一張方子。」</p>
+<p>新囚點了一下頭，沒有問方子。他把兩手攏進袖裏，往牆上靠。年輕的那個把頭又埋回膝上，過了一息，悶悶地說：「外頭冷了吧。」</p>
+<p>「冷了。」韓敬說。</p>
+<p>「院子裏有人？」</p>
+<p>「有一隊人，」他說，「出去了。」</p>
+<p>屋裏靜下來，隔壁有人翻身，木板響了一響。老者坐過的那一塊牆根空著，草上還留著凹下去的一片，新囚沒有去坐。</p>
+<p>韓敬走到自己那一塊草邊，坐下。草在身下響，是薄薄的一聲。右手抬起來，往懷裏去，手到了前襟，是中衣，是布，什麼也沒有。他把手拿出來。</p>
+<p>五個指頭攤開，沒有劃，也沒有按，只是放著。草梗從指縫間伸出來，有一根扎在指腹上，微微地癢。</p>
+<p>小窗底下，光塊落在地上，淡淡的一塊，邊緣正貼著泥地的一道裂縫。過道上有水滴下來，滴了一下，停很久。</p>
+<p>他的手還放在草上。</p>
+                </div>
+            </article>
+
+                <section id="afterword" class="chapter-card afterword-card">
+                    <header class="chapter-header">
+                        <h2 class="chapter-main-heading">創作後記</h2>
+                        <div class="chapter-divider-line"></div>
+                    </header>
+                    <div class="afterword-body">
+<p>這是一部借古喻今的小說。它以明洪武年間的空印案為背景，向上延伸出虛構的人物與情節。以下說明哪些有史可據，哪些是編的。</p>
+<h3>有史可據的部分</h3>
+<p><strong>事件與年代。</strong> 空印案發於洪武九年（1376）。主要依據是方孝孺（案中受害者方克勤之子）所記，與宋濂的墓版文互相印證；鄭士利的上書也有「陛下即位已九年矣」的內證。《明史‧刑法志》另作「十五年」，與同書列傳互相矛盾，另有學者主張八年。本書採九年，月日細節則全是虛構。</p>
+<p><strong>空印為何成為慣例。</strong> 《明史》卷九十四：「每歲布政司、府州縣吏詣戶部核錢糧、軍需諸事，以道遠，預持空印文書，遇部駁即改，以為常。」鄭士利封事（見《明文衡》）解釋了道理：冊上要「合兩縫印」，數字「至部乃定」，若要回本處用印，「非旬日可及」，所以只能先蓋印、後填數。「省部置局督併攢造，有如星火」也出自此疏。</p>
+<p><strong>追究誰。</strong> 方孝孺〈葉伯巨鄭士利傳〉：「凡主印吏及署字有名者，皆逮繫御史獄，獄凡數百人。」《明史》卷一百三十九：「凡主印者論死，佐貳以下榜一百，戍遠方。」又曰：「空印者竟多不免。」書中官吏被逮，署名成為追究的依據，皆以此為地基。</p>
+<p><strong>朝廷的時間。</strong> 洪武九年六月甲午，改行中書省為承宣布政使司；閏九月庚寅，以災異詔求直言（均見《明史》卷二）。書中只讓這兩件事成為人物聽見的傳聞。御史臺在洪武十三年「尋罷」，十五年改置都察院，九年時仍存在。</p>
+<h3>史料有分歧或有限制的部分</h3>
+<ul><li>空印案的年代有八年、九年、十五年三說（見上）。</li><li>被逮的人數：方孝孺只說「數百」，「七八萬」是後世把空印案與郭桓案合併的說法；近年學者估計被逮的官員約百至二百人，總數不到千。本書只寫「幾百人」，由人物口說，不給史實數字。</li><li>「主印者」是官還是吏，史料不分明。《明史》的「佐貳以下」沒有單獨交代吏。</li><li>空印案中「冤」的說法，主要出自方孝孺一系，不是官方文書。本書沒有替「冤」背書。</li><li>赦免或平反，史料沒有明文。</li></ul>
+<h3>全屬虛構的部分</h3>
+<p>以下全部是編的，<strong>不得當作史實</strong>：</p>
+<ul><li>所有人物：韓敬、周進、高謙、袁、曹貴、杜、唐、邵吏、許老吏、問官等。平川府、崇溪、懷陽、臨水府、安平府、瑞陽府等地名。</li><li>「赴京報帳的是小吏」：史料只有「吏詣戶部」一句，沒有說明是誰、帶什麼。</li><li>署字欄與「經手署」：方孝孺說「署字有名者」被逮，沒有說署的是什麼文書。本書把它解釋為冊頁改處旁的經手署名，是創作者的設計，不是史實。</li><li>備換頁（共六頁，用三、封存三）、局簿、原頁存根、小匣封存、收冊帖、局例（「誰經手，誰署名」「倉解不合報主事」「按府序收頁，過時辰不候」）、駁單、倉耗與「憑」欄。</li><li>「主使」與「隨署」之分：書中由問官說出，是問官這麼分，不是律條，也不是史載。</li><li>所有刑名與下場：書中的「榜一百，戍遠方」「論死」等，只是呼應《明史》卷一百三十九的文字，施於吏、施於本書人物，全為虛構。韓敬的下場，書中沒有寫。</li><li>榜文、名單、供狀、藥單、同室囚人、獄吏、新囚。</li><li>書中不出現鄭士利、方克勤等任何真實人物，也不寫皇帝、丞相。</li></ul>
+<h3>為什麼這樣寫</h3>
+<p>空印是一件史書留下很少細節的事：我們知道慣例、知道誰被逮、知道結果，卻不知道那個攜冊赴京的吏在這一年夏天，手上到底拿了什麼、簽了什麼、為誰簽。故事在這個空白裏生長。</p>
+<p>昨日的慣例，今日成了罪；簽下名字的人，要為名字所在的那一行承擔；一個人向下交出自己的風險，也許有他說得出口的理由。這些處境不屬於哪一個朝代。本書沒有替它們下判語，只想把一張紙經過一個人的手，變了誰的處境，一件一件擺出來。</p>
+<h3>查證的局限</h3>
+<p>本書的史料來源主要是維基文庫的轉錄本（《明史》卷二、卷七十五、卷九十四、卷一百三十九，《遜志齋集》卷二十一，《明文衡》卷六，《名臣經濟錄》卷四十六），創作者沒有對照紙本或影本。《明太祖實錄》《國榷》《諸司職掌》《大誥》與洪武七年律文，因無法取得原文，均未讀到。凡本書據以立論的引文，已標明出處，但讀者若要做學術引用，請另行覆核原典。</p>
+<p>若有讀者發現史實上的錯誤，那是創作者的疏失，請以史料為準。</p>
+                    </div>
+                    <div style="text-align:center"><div class="fin-seal">空印</div></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div class="fab-container">
+        <button class="fab-btn" id="btn-back-top" title="回到頂部">▲</button>
+    </div>
+
+    <script>
+        const K = 'kongyin_';
+        const get = k => { try { return localStorage.getItem(K + k); } catch (e) { return null; } };
+        const set = (k, v) => { try { localStorage.setItem(K + k, v); } catch (e) {} };
+        const root = document.documentElement;
+
+        window.addEventListener('scroll', () => {
+            const h = root.scrollHeight - root.clientHeight;
+            document.getElementById('progress-bar').style.width = (h > 0 ? root.scrollTop / h * 100 : 0) + '%';
+        });
+
+        const sidebar = document.getElementById('sidebar');
+        document.getElementById('toggle-sidebar').addEventListener('click', () => {
+            sidebar.classList.toggle(window.innerWidth <= 992 ? 'mobile-open' : 'collapsed');
+        });
+        sidebar.addEventListener('click', e => {
+            if (e.target.closest('a') && window.innerWidth <= 992) sidebar.classList.remove('mobile-open');
+        });
+        document.getElementById('btn-back-top').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        const themes = [{ id: 'xuan', label: '宣紙' }, { id: 'ivory', label: '象牙' }, { id: 'moon', label: '月魄' }, { id: 'white', label: '素白' }];
+        let ti = 0;
+        const themeLabel = document.getElementById('theme-label');
+        const applyTheme = i => { ti = i; root.setAttribute('data-theme', themes[i].id); themeLabel.textContent = themes[i].label; };
+        document.getElementById('btn-theme').addEventListener('click', () => { applyTheme((ti + 1) % themes.length); set('theme', themes[ti].id); });
+
+        let fs = 19;
+        const applySize = () => root.style.setProperty('--font-size', fs + 'px');
+        document.getElementById('btn-font-dec').addEventListener('click', () => { if (fs > 15) { fs--; applySize(); set('fontsize', fs); } });
+        document.getElementById('btn-font-inc').addEventListener('click', () => { if (fs < 25) { fs++; applySize(); set('fontsize', fs); } });
+
+        const fonts = [{ name: '宋體', val: 'var(--font-serif)' }, { name: '楷體', val: 'var(--font-kai)' }, { name: '黑體', val: 'var(--font-sans)' }];
+        let fi = 0;
+        const fontLabel = document.getElementById('font-family-label');
+        const applyFont = i => { fi = i; root.style.setProperty('--reader-font', fonts[i].val); fontLabel.textContent = fonts[i].name; };
+        document.getElementById('btn-font-family').addEventListener('click', () => { applyFont((fi + 1) % fonts.length); set('font', fonts[fi].name); });
+
+        const sections = document.querySelectorAll('.chapter-card, .afterword-card');
+        const navItems = document.querySelectorAll('.nav-item');
+        window.addEventListener('scroll', () => {
+            let cur = '';
+            sections.forEach(s => { if (window.pageYOffset >= s.offsetTop - 120) cur = s.id; });
+            navItems.forEach(i => i.classList.toggle('active', i.dataset.target === cur));
+        });
+
+        const st = themes.findIndex(t => t.id === get('theme')); if (st >= 0) applyTheme(st);
+        const sz = parseInt(get('fontsize')); if (sz >= 15 && sz <= 25) { fs = sz; applySize(); }
+        const sf = fonts.findIndex(f => f.name === get('font')); if (sf >= 0) applyFont(sf);
+    </script>
+</body>
+</html>
